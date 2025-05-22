@@ -20,6 +20,7 @@ class Player {
 
         // adjust horizontal position and mine horizontally while resolving any collisions
         position.x += velocity.x;
+        position.x = constrain(position.x, 0, width - size);
         if (velocity.x != 0) mine(true);
         resolveCollision(true);
 
