@@ -1,0 +1,67 @@
+Square[] grid; // grid for all squares on the screen / anything that can be mined
+Player player;
+int TILE_SIZE; // size for one square
+int w, h; // unit is number of squares
+float cameraOffset;  
+
+// for horizontal movement and digging down
+boolean leftPressed;
+boolean rightPressed;
+boolean downPressed;
+
+public void setup() {
+    size(1000, 500);
+
+    TILE_SIZE = 50;
+    w = 20;
+    h = 300;
+    
+    grid = new Square[w*h];
+    setupGrid();
+    
+    player = new Player();
+}
+
+public void setupGrid() {
+    // first two rows is air (40 squares)
+
+    // first dirt layer
+    for (int i = 40; i < grid.length; i++) {
+        grid[i] = new Dirt();
+    } 
+}
+
+public void draw() {
+    background(161, 211, 255);
+      
+    player.move();
+    cameraOffset = player.position.y - height/2;
+    
+    drawGrid();
+
+    player.draw();
+}
+
+public void drawGrid() {
+    for (int i = 0; i < grid.length; i++) {
+        if (grid[i] == null)
+            continue;
+      
+        int row = i / 20;
+        int col = i % 20;
+        
+        image(grid[i].getSprite(), col * TILE_SIZE, row * TILE_SIZE - cameraOffset);
+    }
+}
+
+public void keyPressed() {
+    if (key == 'a') leftPressed = true;
+    if (key == 'd') rightPressed = true;
+    if (key == 's') downPressed = true;
+}
+
+public void keyReleased() {
+    if (key == 'a') leftPressed = false;
+    if (key == 'd') rightPressed = false;
+    if (key == 's') downPressed = false;
+}
