@@ -11,23 +11,25 @@ boolean downPressed;
 
 // resources that the player has
 final int COAL = 0;
-final int IRON = 1;
+final int COPPER = 1;
 final int GOLD = 2;
 final int DIAMOND = 3;
 
 // sprites
-PImage DIRT_SPRITE;
-PImage COAL_SPRITE;
+PImage PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, COAL_SPRITE, GOLD_SPRITE;
 
 int[] resources = {0, 0, 0, 0};
 
 public void setup() {
     size(750, 1000);
     
+    PLAYER_SPRITE = loadImage("sprites/player.png");
+    PICKAXE_SPRITE = loadImage("sprites/pickaxe.png");
     DIRT_SPRITE = loadImage("sprites/dirt.png");
     COAL_SPRITE = loadImage("sprites/coal.png");
+    GOLD_SPRITE = loadImage("sprites/gold.png");
 
-    TILE_SIZE = 25;
+    TILE_SIZE = 30;
     w = 30;
     h = 300;
     
@@ -43,13 +45,18 @@ public void setupGrid() {
 
 public void dirtLayer() {
     // rows of dirt
-    for (int i = 0; i < 20 * w; i++) {
+    for (int i = 0; i < 50 * w; i++) {
         grid[i] = new Dirt();
     }
     
     // coal randomly dispersed
-    for (int coal = 0; coal < 10; coal++) {
-        grid[5 * w + int(random(10 * w))] = new Coal();
+    for (int coal = 0; coal < 50; coal++) {
+        grid[int(random(50 * w))] = new Coal();
+    }
+    
+    // gold randomly dispersed
+    for (int gold = 0; gold < 50; gold++) {
+        grid[int(random(50 * w))] = new Gold();
     }
 }
 

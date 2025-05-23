@@ -3,6 +3,9 @@ class Player {
     private PVector velocity;
     private float size = TILE_SIZE * 0.8;
     private int damage = 1;
+    private boolean mirror;
+    private float pickaxeSwingAngle = 0;
+    private float pickaxeSwingSpeed = 0.2;
 
     public Player() {
         position = new PVector(width/2, -2);
@@ -12,8 +15,14 @@ class Player {
     public void move() {
         // handle movement for left and right
         velocity.x = 0;
-        if (leftPressed) velocity.x = -3;
-        if (rightPressed) velocity.x = 3;
+        if (leftPressed) {
+             velocity.x = -3;
+             mirror = true;
+        }
+        if (rightPressed) {
+            velocity.x = 3;
+            mirror = false;
+        }
 
         // add gravity
         velocity.y = 4;
@@ -33,7 +42,35 @@ class Player {
     public void draw() {
         noStroke();
         fill(255, 225, 161);
-        square(position.x, position.y - cameraOffset, size);
+
+        if (leftPressed || rightPressed || downPressed) {
+            pickaxeSwingAngle += pickaxeSwingSpeed;
+            if (pickaxeSwingAngle > PI/3 || pickaxeSwingAngle < 0) pickaxeSwingSpeed *= -1;
+        } else {
+            pickaxeSwingAngle = 0;
+        }
+
+        if (mirror) {
+            pushMatrix();
+            scale(-1, 1);
+            image(PLAYER_SPRITE, -position.x - size, position.y - cameraOffset);
+
+            pushMatrix();
+            translate(-position.x, position.y - cameraOffset + size);
+            rotate(pickaxeSwingAngle);
+            image(PICKAXE_SPRITE, -5, -size + 5);
+            popMatrix();
+
+            popMatrix();
+        } else {
+            image(PLAYER_SPRITE, position.x, position.y - cameraOffset);
+
+            pushMatrix();
+            translate(position.x + size, position.y - cameraOffset + size);
+            rotate(pickaxeSwingAngle);
+            image(PICKAXE_SPRITE, -5, -size + 5);
+            popMatrix();
+        }
     }
 
     public PVector getPosition() {

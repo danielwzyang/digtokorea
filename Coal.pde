@@ -1,8 +1,9 @@
 class Coal extends Square {
     public Coal() {
-        super(20, COAL_SPRITE);
+        super(15, COAL_SPRITE);
     }
     
+    @Override
     public void breakSquare() {
         resources[COAL]++;
     }
