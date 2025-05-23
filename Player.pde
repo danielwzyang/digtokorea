@@ -12,8 +12,8 @@ class Player {
     public void move() {
         // handle movement for left and right
         velocity.x = 0;
-        if (leftPressed) velocity.x = -3;
-        if (rightPressed) velocity.x = 3;
+        if (leftPressed) velocity.x = -1.5;
+        if (rightPressed) velocity.x = 1.5;
 
         // add gravity
         velocity.y = 4;

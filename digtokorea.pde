@@ -3,6 +3,9 @@ Player player;
 int TILE_SIZE; // size for one square
 int w, h; // unit is number of squares
 float cameraOffset;  
+double currSec;
+double currMin;
+double remainingTime;
 
 // for horizontal movement and digging down
 boolean leftPressed;
@@ -55,7 +58,14 @@ public void dirtLayer() {
 
 public void draw() {
     background(161, 211, 255);
-      
+    rectangle(0,0)
+    if (frameCount % 60 == 0){
+      currSec++;
+      if (currSec > 60){
+        currSec = 0;
+      }
+      currMin++;
+    }
     player.move();
     cameraOffset = player.position.y - height/3;
     
