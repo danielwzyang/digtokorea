@@ -24,8 +24,8 @@ int[] resources = {0, 0, 0, 0};
 public void setup() {
     size(750, 1000);
     
-    DIRT_SPRITE = loadImage("dirt.png");
-    COAL_SPRITE = loadImage("coal.png");
+    DIRT_SPRITE = loadImage("sprites/dirt.png");
+    COAL_SPRITE = loadImage("sprites/coal.png");
 
     TILE_SIZE = 25;
     w = 30;
