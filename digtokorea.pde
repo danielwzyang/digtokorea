@@ -24,11 +24,11 @@ int[] resources = {0, 0, 0, 0};
 public void setup() {
     size(750, 1000);
     
-    DIRT_SPRITE = loadImage("/sprites/dirt.png");
-    COAL_SPRITE = loadImage("/sprites/coal.png");
+    DIRT_SPRITE = loadImage("dirt.png");
+    COAL_SPRITE = loadImage("coal.png");
 
-    TILE_SIZE = 50;
-    w = 15;
+    TILE_SIZE = 25;
+    w = 30;
     h = 300;
     
     grid = new Square[w*h];
@@ -64,6 +64,7 @@ public void draw() {
     player.draw();
     
     fill(0, 0, 0);
+
     textSize(30);
     text("coal: " + resources[COAL], 30, 30);
 }
@@ -79,6 +80,7 @@ public void drawGrid() {
             continue;
         }
         
+        tint(constrain((int)((grid[i].health / grid[i].maxHealth) * 255), 175, 255));
         image(grid[i].getSprite(), col * TILE_SIZE, row * TILE_SIZE - cameraOffset);
     }
 }
