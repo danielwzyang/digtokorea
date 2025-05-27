@@ -1,6 +1,6 @@
 class Gold extends Square {
-    public Gold() {
-        super(15, GOLD_SPRITE);
+    public Gold(int layer) {
+        super(SQUARE_HEALTH[layer], GOLD_SPRITES[layer]);
     }
     
     @Override

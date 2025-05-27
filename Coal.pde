@@ -1,6 +1,6 @@
 class Coal extends Square {
-    public Coal() {
-        super(15, COAL_SPRITE);
+    public Coal(int layer) {
+        super(SQUARE_HEALTH[layer], COAL_SPRITES[layer]);
     }
     
     @Override

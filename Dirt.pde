@@ -1,5 +1,5 @@
 class Dirt extends Square {
     public Dirt() {
-        super(15, DIRT_SPRITE);
+        super(SQUARE_HEALTH[0], DIRT_SPRITE);
     }
 }

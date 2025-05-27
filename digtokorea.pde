@@ -11,12 +11,16 @@ boolean downPressed;
 
 // resources that the player has
 final int COAL = 0;
-final int COPPER = 1;
+final int IRON = 1;
 final int GOLD = 2;
-final int DIAMOND = 3;
+final int TITANIUM = 3;
+
+// health for each square by layer
+int[] SQUARE_HEALTH = {15, 30, 60};
 
 // sprites
-PImage PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, COAL_SPRITE, GOLD_SPRITE;
+PImage PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE;
+PImage[] COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES;
 
 int[] resources = {0, 0, 0, 0};
 
@@ -25,9 +29,24 @@ public void setup() {
     
     PLAYER_SPRITE = loadImage("sprites/player.png");
     PICKAXE_SPRITE = loadImage("sprites/pickaxe.png");
+    
     DIRT_SPRITE = loadImage("sprites/dirt.png");
-    COAL_SPRITE = loadImage("sprites/coal.png");
-    GOLD_SPRITE = loadImage("sprites/gold.png");
+    CLAY_SPRITE = loadImage("sprites/clay.png");
+    
+    COAL_SPRITES = new PImage[]{
+        loadImage("sprites/dirt_coal.png"),
+        loadImage("sprites/clay_coal.png"),
+    };
+    
+    IRON_SPRITES = new PImage[]{
+        loadImage("sprites/dirt_iron.png"),
+        loadImage("sprites/clay_iron.png"),
+    };
+    
+    GOLD_SPRITES = new PImage[]{
+        loadImage("sprites/dirt_gold.png"),
+        loadImage("sprites/clay_gold.png"),
+    };
 
     TILE_SIZE = 30;
     w = 30;
@@ -41,6 +60,7 @@ public void setup() {
 
 public void setupGrid() {
     dirtLayer();
+    clayLayer();
 }
 
 public void dirtLayer() {
@@ -50,13 +70,51 @@ public void dirtLayer() {
     }
     
     // coal randomly dispersed
-    for (int coal = 0; coal < 50; coal++) {
-        grid[int(random(50 * w))] = new Coal();
+    for (int i = 0; i < 50; i++) {
+        grid[int(random(50 * w))] = new Coal(0);
+    }
+    
+    // iron randomly dispersed
+    for (int i = 0; i < 30; i++) {
+        grid[int(random(50 * w))] = new Iron(0);
     }
     
     // gold randomly dispersed
-    for (int gold = 0; gold < 50; gold++) {
-        grid[int(random(50 * w))] = new Gold();
+    for (int i = 0; i < 50; i++) {
+        grid[int(random(50 * w))] = new Gold(0);
+    }
+}
+
+public void clayLayer() {
+    // spots of clay in dirt layer with increasing densities
+    for (int i = 0; i < 20; i++) {
+        grid[int(random(10 * w)) + 40 * w] = new Clay();
+    }
+    for (int i = 0; i < 20; i++) {
+        grid[int(random(5 * w)) + 45 * w] = new Clay();
+    }
+    for (int i = 0; i < 20; i++) {
+        grid[int(random(2 * w)) + 48 * w] = new Clay();
+    }
+  
+    // rows of clay
+    for (int i = 50 * w; i < 100 * w; i++) {
+        grid[i] = new Clay();
+    }
+    
+    // coal randomly dispersed
+    for (int i = 0; i < 50; i++) {
+        grid[50 * w + int(random(50 * w))] = new Coal(1);
+    }
+    
+    // iron randomly dispersed
+    for (int i = 0; i < 30; i++) {
+        grid[50 * w + int(random(50 * w))] = new Iron(1);
+    }
+    
+    // gold randomly dispersed
+    for (int i = 0; i < 50; i++) {
+        grid[50 * w + int(random(50 * w))] = new Gold(1);
     }
 }
 
@@ -71,9 +129,6 @@ public void draw() {
     player.draw();
     
     fill(0, 0, 0);
-
-    textSize(30);
-    text("coal: " + resources[COAL], 30, 30);
 }
 
 public void drawGrid() {
