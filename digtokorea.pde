@@ -3,8 +3,11 @@ Player player;
 int TILE_SIZE; // size for one square
 int w, h; // unit is number of squares
 float cameraOffset;  
-double currSec;
-double currMin;
+
+//Time gauging purpose
+int currSec;
+int currMin;
+double totalTime;
 double remainingTime;
 
 // for horizontal movement and digging down
@@ -58,14 +61,15 @@ public void dirtLayer() {
 
 public void draw() {
     background(161, 211, 255);
-    rectangle(0,0)
     if (frameCount % 60 == 0){
       currSec++;
       if (currSec > 60){
         currSec = 0;
+        currMin++;
       }
-      currMin++;
+      
     }
+    
     player.move();
     cameraOffset = player.position.y - height/3;
     
@@ -76,7 +80,27 @@ public void draw() {
     fill(0, 0, 0);
 
     textSize(30);
-    text("coal: " + resources[COAL], 30, 30);
+    text("coal: " + resources[COAL], 0, 130);
+    textSize(100);
+    fill(#000000);
+    rect(0,0, (230), (100));
+    fill(#00FF00);
+    String secondTime = "" + currSec;
+    String minTime = "" + currMin;
+    if (currSec < 10){
+       secondTime = "0" + currSec;
+    }
+    if (currMin < 10){
+       minTime = "0" + currMin;
+    }
+
+    text("" + minTime + ":" + secondTime , 0, 80);
+    
+    
+    fill(#a8a7a6);
+    rect(width/6, height/5, (float)(width * (4.0/6)), 20);
+    fill(#e95c50);
+    rect(width/(6 - .3), height/(5-.06), (float)(remainingTime / totalTime * (width * (37/57))), 15);
 }
 
 public void drawGrid() {
