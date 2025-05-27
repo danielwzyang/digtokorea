@@ -7,13 +7,20 @@ float cameraOffset;
 //Time gauging purpose
 int currSec;
 int currMin;
-double totalTime;
-double remainingTime;
+double totalTime = 2;
+double remainingTime = 2;
+
+//Game pause/shop phase
+boolean gamePaused = false;
+boolean gameStart = false;
 
 // for horizontal movement and digging down
 boolean leftPressed;
 boolean rightPressed;
 boolean downPressed;
+
+//Power up
+boolean timeFrozen = false;
 
 // resources that the player has
 final int COAL = 0;
@@ -61,14 +68,30 @@ public void dirtLayer() {
 
 public void draw() {
     background(161, 211, 255);
-    if (frameCount % 60 == 0){
-      currSec++;
-      if (currSec > 60){
-        currSec = 0;
-        currMin++;
+    //Triggering the start of a game USE SETUP()
+    
+    //Tracking stopwatch and time remaining in the case of a continuing game
+    if (gamePaused == false){
+      remainingTime -= (1.0/60); //60 to account for a 60fps game
+      print(remainingTime);
+      if (remainingTime < (0)){
+        gamePaused = true;
       }
+      if (frameCount % 60 == 0){
+        currSec++;
+        if (currSec > 60){
+          currSec = 0;
+          currMin++;
+        }
+      }
+    }
+    else{ //Creation of shop
+      leftPressed = false;
+      downPressed = false;
+      rightPressed = false;
       
     }
+
     
     player.move();
     cameraOffset = player.position.y - height/3;
@@ -81,6 +104,8 @@ public void draw() {
 
     textSize(30);
     text("coal: " + resources[COAL], 0, 130);
+    
+    //Main game stopwatch
     textSize(100);
     fill(#000000);
     rect(0,0, (230), (100));
@@ -93,14 +118,13 @@ public void draw() {
     if (currMin < 10){
        minTime = "0" + currMin;
     }
-
     text("" + minTime + ":" + secondTime , 0, 80);
     
-    
+    //Round timer
     fill(#a8a7a6);
     rect(width/6, height/5, (float)(width * (4.0/6)), 20);
     fill(#e95c50);
-    rect(width/(6 - .3), height/(5-.06), (float)(remainingTime / totalTime * (width * (37/57))), 15);
+    rect(width/(6 - .1), height/(5-.06), (float)(remainingTime / totalTime * (width * (0.661))), 15); //CALCULATED WIDTH BY doing (1 - 2/.59)
 }
 
 public void drawGrid() {
@@ -120,13 +144,17 @@ public void drawGrid() {
 }
 
 public void keyPressed() {
+  if (gamePaused == false){
     if (key == 'a') leftPressed = true;
     if (key == 'd') rightPressed = true;
     if (key == 's') downPressed = true;
+  }
 }
 
 public void keyReleased() {
+  if (gamePaused == false){
     if (key == 'a') leftPressed = false;
     if (key == 'd') rightPressed = false;
     if (key == 's') downPressed = false;
+  }
 }
