@@ -7,8 +7,8 @@ float cameraOffset;
 //Time gauging purpose
 int currSec;
 int currMin;
-double totalTime = 2;
-double remainingTime = 2;
+double totalTime = 15;
+double remainingTime = 15;
 
 //Game pause/shop phase
 boolean gamePaused = false;
@@ -273,7 +273,6 @@ public void draw() {
       downPressed = false;
       rightPressed = false;
       fill(#e0e0de);
-      print(slide);
       if (slide < 0 && bounceThreeTimes){ //OVERALL POINT IS TO GET THEM 1000 UNITS TO THE RIGHT
         slide += acceleration;
         acceleration += .3;
