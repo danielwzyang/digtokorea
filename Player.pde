@@ -15,8 +15,14 @@ class Player {
     public void move() {
         // handle movement for left and right
         velocity.x = 0;
-        if (leftPressed) velocity.x = -1.5;
-        if (rightPressed) velocity.x = 1.5;
+        if (leftPressed) {
+            velocity.x = -1.5;
+            mirror = true;
+        }
+        if (rightPressed) {
+            velocity.x = 1.5;
+            mirror = false;
+        }
 
         // add gravity
         velocity.y = 4;

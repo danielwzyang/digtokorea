@@ -7,8 +7,8 @@ float cameraOffset;
 //Time gauging purpose
 int currSec;
 int currMin;
-double totalTime = 2;
-double remainingTime = 2;
+double totalTime = 10;
+double remainingTime = 10;
 
 //Game pause/shop phase
 boolean gamePaused = false;
@@ -138,7 +138,6 @@ public void draw() {
     //Tracking stopwatch and time remaining in the case of a continuing game
     if (gamePaused == false){
       remainingTime -= (1.0/60); //60 to account for a 60fps game
-      print(remainingTime);
       if (remainingTime < (0)){
         gamePaused = true;
       }
@@ -166,9 +165,6 @@ public void draw() {
     player.draw();
     
     fill(0, 0, 0);
-
-    textSize(30);
-    text("coal: " + resources[COAL], 0, 130);
     
     //Main game stopwatch
     textSize(100);
