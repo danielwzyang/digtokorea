@@ -7,8 +7,8 @@ float cameraOffset;
 //Time gauging purpose
 int currSec;
 int currMin;
-double totalTime = 15;
-double remainingTime = 15;
+double maxTime;
+double remainingTime;
 
 //Game pause/shop phase
 boolean gamePaused = false;
@@ -85,6 +85,9 @@ public void setup() {
     setupGrid();
     
     player = new Player();
+    
+    //Setting maximum time
+    maxTime = 10;
 }
 
 public void setupGrid() {
@@ -150,14 +153,16 @@ public void clayLayer() {
 public void draw() {
   
     if (newRoundTrue){
+      
+        if (leftPressed|| rightPressed|| downPressed){
+          newRoundTrue = false;
+        }
       //textSize(100);
       //if (countDown == 4 && frameCount % 60 == 0){
-            grid = new Square[w*h];
-            setupGrid();
             player = new Player();
       //}
       shopTime = 0;
-      remainingTime = totalTime;
+      remainingTime = maxTime;
       slide = -1000;
       //if (frameCount % 60 == 0){
       //  countDown--;
@@ -182,7 +187,6 @@ public void draw() {
         //countYd = 1050;
          //countXr = 770;
          //countYu = -50;
-        newRoundTrue = false;
         bounceCount = 0;
         bounceThreeTimes = true;
         acceleration = .1;
@@ -213,7 +217,7 @@ public void draw() {
     fill(#a8a7a6);
     rect(width/6, height/5, (float)(width * (4.0/6)), 20);
     fill(#e95c50);
-    rect(width/(6 - .1), height/(5-.06), (float)(remainingTime / totalTime * (width * (0.661))), 15); //CALCULATED WIDTH BY doing (1 - 2/.59)
+    rect(width/(6 - .1), height/(5-.06), (float)(remainingTime / maxTime * (width * (0.661))), 15); //CALCULATED WIDTH BY doing (1 - 2/.59)
     
     //Tracking stopwatch and time remaining in the case of a continuing game
     if (gamePaused == false){ //DIGGING PHASE
@@ -222,7 +226,7 @@ public void draw() {
       if (remainingTime < (0)){
         gamePaused = true;
       }
-      if (frameCount % 60 == 0){
+      if (frameCount % 60 == 0 && newRoundTrue == false){
         currSec++;
         if (currSec > 60){
           currSec = 0;
@@ -317,6 +321,9 @@ public void draw() {
         shopTime++;
       }
     }
+    //Depth recorder here
+    text((int)((player.getPosition().y + 24) / 30), 300, 100 );
+    
     
 }
 
@@ -337,10 +344,11 @@ public void drawGrid() {
 }
 
 public void keyPressed() {
-  if (gamePaused == false && newRoundTrue == false){
+  if (gamePaused == false){
     if (key == 'a') leftPressed = true;
     if (key == 'd') rightPressed = true;
     if (key == 's') downPressed = true;
+    
   }
 }
 
@@ -350,6 +358,7 @@ public void keyPressed() {
 
 public void mouseClicked(){
   if (mouseX > 400 && mouseX < 650 && mouseY > 750 && mouseY < 850 && gamePaused && shopTime > 2){
+    setupGrid();
     newRoundTrue = true;
     gamePaused = false;
   }
