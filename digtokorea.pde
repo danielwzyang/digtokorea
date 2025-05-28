@@ -7,8 +7,8 @@ float cameraOffset;
 //Time gauging purpose
 int currSec;
 int currMin;
-double totalTime = 10;
-double remainingTime = 10;
+double totalTime = 30;
+double remainingTime = 30;
 
 //Game pause/shop phase
 boolean gamePaused = false;
