@@ -7,17 +7,33 @@ float cameraOffset;
 //Time gauging purpose
 int currSec;
 int currMin;
-double totalTime = 30;
-double remainingTime = 30;
+double totalTime = 2;
+double remainingTime = 2;
 
 //Game pause/shop phase
 boolean gamePaused = false;
 boolean gameStart = false;
+double shopTime = 0;
+
+//Restart game phase
+boolean newRoundTrue = true;
+int countDown = 4;
+float countXl = -20;
+float countYd = 1050;
+float countXr = 770;
+float countYu = -50;
 
 // for horizontal movement and digging down
 boolean leftPressed;
 boolean rightPressed;
 boolean downPressed;
+
+// Initial left slide animation
+double slide = -1000;
+double acceleration = .1;
+boolean bounceThreeTimes = true;
+int bounceCount = 0;
+
 
 //Power up
 boolean timeFrozen = false;
@@ -132,11 +148,76 @@ public void clayLayer() {
 }
 
 public void draw() {
+  
+    if (newRoundTrue){
+      //textSize(100);
+      //if (countDown == 4 && frameCount % 60 == 0){
+            grid = new Square[w*h];
+            setupGrid();
+            player = new Player();
+      //}
+      shopTime = 0;
+      remainingTime = totalTime;
+      slide = -1000;
+      //if (frameCount % 60 == 0){
+      //  countDown--;
+      //} 
+      //text("hi", 300, 300);
+     // if (countDown == 3){
+     //   countXl += 12.5;
+     //   text(parseInt(countDown), countXl, height/2 - 30);
+     // }
+     // if (countDown == 2){
+     //   countYu += 15;
+     //   text(parseInt(countDown), width/2 - 30, countYu);
+     // }
+     // if (countDown == 1){
+     //   countXr -= 12.5;
+     //   text(parseInt(countDown), countXr, height/2 - 30);
+     // }
+      //if (countDown == 0){
+        //countYd -= 15;
+        //text("GO", width/2 - 30, countYd);
+        //countXl = -20;
+        //countYd = 1050;
+         //countXr = 770;
+         //countYu = -50;
+        newRoundTrue = false;
+        bounceCount = 0;
+        bounceThreeTimes = true;
+        acceleration = .1;
+      //}
+      //if (countDown == -1){
+         
+      //}
+    }
+  
+  
+  
+  
     background(161, 211, 255);
     //Triggering the start of a game USE SETUP()
     
+    player.move();
+    cameraOffset = player.position.y - height/3;
+    
+    drawGrid();
+
+    player.draw();
+    
+    fill(0, 0, 0);
+    
+    
+    
+    //Round timer
+    fill(#a8a7a6);
+    rect(width/6, height/5, (float)(width * (4.0/6)), 20);
+    fill(#e95c50);
+    rect(width/(6 - .1), height/(5-.06), (float)(remainingTime / totalTime * (width * (0.661))), 15); //CALCULATED WIDTH BY doing (1 - 2/.59)
+    
     //Tracking stopwatch and time remaining in the case of a continuing game
-    if (gamePaused == false){
+    if (gamePaused == false){ //DIGGING PHASE
+      //if (newRoundTrue == false){
       remainingTime -= (1.0/60); //60 to account for a 60fps game
       if (remainingTime < (0)){
         gamePaused = true;
@@ -148,44 +229,96 @@ public void draw() {
           currMin++;
         }
       }
+      //}
+      //Main game stopwatch
+      textSize(100);
+      fill(#000000);
+      rect(0,0, (230), (80));
+      rect(0,0, (210), (100));
+      circle(210,80, 40);
+      fill(#0394fc);
+      String secondTime = "" + currSec;
+      String minTime = "" + currMin;
+      if (currSec < 10){
+         secondTime = "0" + currSec;
+      }
+      if (currMin < 10){
+         minTime = "0" + currMin;
+      }
+      text("" + minTime + ":" + secondTime , 0, 80);
     }
-    else{ //Creation of shop
+    else{ //SHOP PHASE
+      //Timer (red)
+      textSize(100);
+      fill(#000000);
+      rect(0,0, (230), (80));
+      rect(0,0, (210), (100));
+      circle(210,80, 40);
+      fill(#fc0352);
+      String secondTime = "" + currSec;
+      String minTime = "" + currMin;
+      if (currSec < 10){
+         secondTime = "0" + currSec;
+      }
+      if (currMin < 10){
+         minTime = "0" + currMin;
+      }
+      text("" + minTime + ":" + secondTime , 0, 80);
+      
+      
+      
+      //Creation of shop
+
       leftPressed = false;
       downPressed = false;
       rightPressed = false;
+      fill(#e0e0de);
+      print(slide);
+      if (slide < 0 && bounceThreeTimes){ //OVERALL POINT IS TO GET THEM 1000 UNITS TO THE RIGHT
+        slide += acceleration;
+        acceleration += .3;
+      }
+      if (slide > 0){
+        if (acceleration > 0){
+          acceleration = 0;
+        }
+        slide+= acceleration;
+        acceleration -= .3;
+        if (slide < 0){
+          bounceCount++;
+        }
+        if (bounceCount >= 3){
+          bounceThreeTimes = false;
+          slide = 0;
+        }
+      }
       
-    }
+      rect((float)slide + 93.25, height/10, width * (6/8.0), height * (8.0/10));
+      rect((float)slide + 93.25-25, height/8, width * (8.0/10) + 12.5, height * (6/8.0)); //Overlapping rectangles with circles for a smoother shape
+      circle((float)slide + 93.25, height/8, 50);
+      circle((float)slide + 93.25, 7 * height/8, 50);
+      circle((float)(slide + 93.25 +562.5), 7 * height/8, 50);
+      circle((float)(slide + 93.25 +562.5), height/8, 50);
+      fill(#FFFFFF);
+      
 
-    
-    player.move();
-    cameraOffset = player.position.y - height/3;
-    
-    drawGrid();
-
-    player.draw();
-    
-    fill(0, 0, 0);
-    
-    //Main game stopwatch
-    textSize(100);
-    fill(#000000);
-    rect(0,0, (230), (100));
-    fill(#00FF00);
-    String secondTime = "" + currSec;
-    String minTime = "" + currMin;
-    if (currSec < 10){
-       secondTime = "0" + currSec;
+      rect((float)slide + 100, 150, 550, 250);
+      rect((float)slide + 100, 450, 250, 250);
+      rect((float)slide + 400, 450, 250, 250);
+      rect((float)slide + 100, 750, 250, 100);
+      rect((float)slide + 400, 750, 250, 100);
+      textSize(50);
+      fill(#000000);
+      text("SHOP", (float)(slide + 312.5), 140);
+      textSize(30);
+      text("INVENTORY", (float)(slide + 308), 390); 
+      textSize(40);
+      text("NEXT ROUND", (float)slide + 415, 812);
+      if (frameCount % 60 == 0){
+        shopTime++;
+      }
     }
-    if (currMin < 10){
-       minTime = "0" + currMin;
-    }
-    text("" + minTime + ":" + secondTime , 0, 80);
     
-    //Round timer
-    fill(#a8a7a6);
-    rect(width/6, height/5, (float)(width * (4.0/6)), 20);
-    fill(#e95c50);
-    rect(width/(6 - .1), height/(5-.06), (float)(remainingTime / totalTime * (width * (0.661))), 15); //CALCULATED WIDTH BY doing (1 - 2/.59)
 }
 
 public void drawGrid() {
@@ -205,10 +338,21 @@ public void drawGrid() {
 }
 
 public void keyPressed() {
-  if (gamePaused == false){
+  if (gamePaused == false && newRoundTrue == false){
     if (key == 'a') leftPressed = true;
     if (key == 'd') rightPressed = true;
     if (key == 's') downPressed = true;
+  }
+}
+
+//public void restartGame(){
+  
+//}
+
+public void mouseClicked(){
+  if (mouseX > 400 && mouseX < 650 && mouseY > 750 && mouseY < 850 && gamePaused && shopTime > 2){
+    newRoundTrue = true;
+    gamePaused = false;
   }
 }
 
