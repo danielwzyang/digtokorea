@@ -2,26 +2,21 @@ Square[] grid; // grid for all squares on the screen / anything that can be mine
 Player player;
 int TILE_SIZE; // size for one square
 int w, h; // unit is number of squares
-float cameraOffset;  
+float cameraOffset;
 
-//Time gauging purpose
+// Time gauging purpose
 int currSec;
 int currMin;
 double totalTime = 15;
 double remainingTime = 15;
 
-//Game pause/shop phase
+// Game pause/shop phase
 boolean gamePaused = false;
 boolean gameStart = false;
 double shopTime = 0;
 
-//Restart game phase
+// Restart game phase
 boolean newRoundTrue = true;
-int countDown = 4;
-float countXl = -20;
-float countYd = 1050;
-float countXr = 770;
-float countYu = -50;
 
 // for horizontal movement and digging down
 boolean leftPressed;
@@ -34,8 +29,7 @@ double acceleration = .1;
 boolean bounceThreeTimes = true;
 int bounceCount = 0;
 
-
-//Power up
+// Power up
 boolean timeFrozen = false;
 
 // resources that the player has
@@ -45,34 +39,45 @@ final int GOLD = 2;
 final int TITANIUM = 3;
 
 // health for each square by layer
-int[] SQUARE_HEALTH = {15, 30, 60};
+int[] SQUARE_HEALTH = { 15, 30, 60 };
 
 // sprites
-PImage PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE;
-PImage[] COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES;
+PImage BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE;
+PImage[] RESOURCE_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES;
 
-int[] resources = {0, 0, 0, 0};
+int[] resources = { 0, 0, 0, 0 };
+
+PFont font;
 
 public void setup() {
     size(750, 1000);
-    
+
+    BANNER_SPRITE = loadImage("sprites/banner.png");
+    SHOP_SPRITE = loadImage("sprites/shop.png");
     PLAYER_SPRITE = loadImage("sprites/player.png");
     PICKAXE_SPRITE = loadImage("sprites/pickaxe.png");
-    
+
     DIRT_SPRITE = loadImage("sprites/dirt.png");
     CLAY_SPRITE = loadImage("sprites/clay.png");
     
-    COAL_SPRITES = new PImage[]{
+    RESOURCE_SPRITES = new PImage[] {
+        loadImage("sprites/coal.png"),
+        loadImage("sprites/iron.png"),
+        loadImage("sprites/gold.png"),
+        loadImage("sprites/coal.png"),
+    };
+
+    COAL_SPRITES = new PImage[] {
         loadImage("sprites/dirt_coal.png"),
         loadImage("sprites/clay_coal.png"),
     };
-    
-    IRON_SPRITES = new PImage[]{
+
+    IRON_SPRITES = new PImage[] {
         loadImage("sprites/dirt_iron.png"),
         loadImage("sprites/clay_iron.png"),
     };
-    
-    GOLD_SPRITES = new PImage[]{
+
+    GOLD_SPRITES = new PImage[] {
         loadImage("sprites/dirt_gold.png"),
         loadImage("sprites/clay_gold.png"),
     };
@@ -80,11 +85,14 @@ public void setup() {
     TILE_SIZE = 30;
     w = 30;
     h = 300;
-    
-    grid = new Square[w*h];
+
+    grid = new Square[w * h];
     setupGrid();
-    
+
     player = new Player();
+
+    font = createFont("pixelfont.ttf", 50);
+    textFont(font);
 }
 
 public void setupGrid() {
@@ -149,54 +157,20 @@ public void clayLayer() {
 
 public void draw() {
   
-    if (newRoundTrue){
-      //textSize(100);
-      //if (countDown == 4 && frameCount % 60 == 0){
-            grid = new Square[w*h];
-            setupGrid();
-            player = new Player();
-      //}
-      shopTime = 0;
-      remainingTime = totalTime;
-      slide = -1000;
-      //if (frameCount % 60 == 0){
-      //  countDown--;
-      //} 
-      //text("hi", 300, 300);
-     // if (countDown == 3){
-     //   countXl += 12.5;
-     //   text(parseInt(countDown), countXl, height/2 - 30);
-     // }
-     // if (countDown == 2){
-     //   countYu += 15;
-     //   text(parseInt(countDown), width/2 - 30, countYu);
-     // }
-     // if (countDown == 1){
-     //   countXr -= 12.5;
-     //   text(parseInt(countDown), countXr, height/2 - 30);
-     // }
-      //if (countDown == 0){
-        //countYd -= 15;
-        //text("GO", width/2 - 30, countYd);
-        //countXl = -20;
-        //countYd = 1050;
-         //countXr = 770;
-         //countYu = -50;
+    if (newRoundTrue) {
+        grid = new Square[w*h];
+        setupGrid();
+        player = new Player();
+        shopTime = 0;
+        remainingTime = totalTime;
+        slide = -1000;
         newRoundTrue = false;
         bounceCount = 0;
         bounceThreeTimes = true;
         acceleration = .1;
-      //}
-      //if (countDown == -1){
-         
-      //}
     }
   
-  
-  
-  
     background(161, 211, 255);
-    //Triggering the start of a game USE SETUP()
     
     player.move();
     cameraOffset = player.position.y - height/3;
@@ -207,116 +181,123 @@ public void draw() {
     
     fill(0, 0, 0);
     
-    
+    // depth banner
+    drawBanner();
     
     //Round timer
-    fill(#a8a7a6);
-    rect(width/6, height/5, (float)(width * (4.0/6)), 20);
-    fill(#e95c50);
-    rect(width/(6 - .1), height/(5-.06), (float)(remainingTime / totalTime * (width * (0.661))), 15); //CALCULATED WIDTH BY doing (1 - 2/.59)
+    drawRoundTimer();
     
     //Tracking stopwatch and time remaining in the case of a continuing game
     if (gamePaused == false){ //DIGGING PHASE
-      //if (newRoundTrue == false){
-      remainingTime -= (1.0/60); //60 to account for a 60fps game
-      if (remainingTime < (0)){
-        gamePaused = true;
-      }
-      if (frameCount % 60 == 0){
-        currSec++;
-        if (currSec > 60){
-          currSec = 0;
-          currMin++;
+        remainingTime -= (1.0/60); //60 to account for a 60fps game
+        if (remainingTime < (0)){
+            gamePaused = true;
         }
-      }
-      //}
-      //Main game stopwatch
-      textSize(100);
-      fill(#000000);
-      rect(0,0, (230), (80));
-      rect(0,0, (210), (100));
-      circle(210,80, 40);
-      fill(#0394fc);
-      String secondTime = "" + currSec;
-      String minTime = "" + currMin;
-      if (currSec < 10){
-         secondTime = "0" + currSec;
-      }
-      if (currMin < 10){
-         minTime = "0" + currMin;
-      }
-      text("" + minTime + ":" + secondTime , 0, 80);
+        if (frameCount % 60 == 0){
+            currSec++;
+            if (currSec > 60){
+                currSec = 0;
+                currMin++;
+            }
+        }
+        //Main game stopwatch
+        drawStopwatch(false);
+        
     }
     else{ //SHOP PHASE
-      //Timer (red)
-      textSize(100);
-      fill(#000000);
-      rect(0,0, (230), (80));
-      rect(0,0, (210), (100));
-      circle(210,80, 40);
-      fill(#fc0352);
-      String secondTime = "" + currSec;
-      String minTime = "" + currMin;
-      if (currSec < 10){
-         secondTime = "0" + currSec;
-      }
-      if (currMin < 10){
-         minTime = "0" + currMin;
-      }
-      text("" + minTime + ":" + secondTime , 0, 80);
-      
-      
-      
-      //Creation of shop
+        drawStopwatch(true);
+        
+        //Creation of shop
 
-      leftPressed = false;
-      downPressed = false;
-      rightPressed = false;
-      fill(#e0e0de);
-      if (slide < 0 && bounceThreeTimes){ //OVERALL POINT IS TO GET THEM 1000 UNITS TO THE RIGHT
-        slide += acceleration;
-        acceleration += .3;
-      }
-      if (slide > 0){
-        if (acceleration > 0){
-          acceleration = 0;
+        leftPressed = false;
+        downPressed = false;
+        rightPressed = false;
+        fill(#e0e0de);
+        
+        if (slide < 0 && bounceThreeTimes){ //OVERALL POINT IS TO GET THEM 1000 UNITS TO THE RIGHT
+            slide += acceleration;
+            acceleration += .3;
         }
-        slide+= acceleration;
-        acceleration -= .3;
-        if (slide < 0){
-          bounceCount++;
+        if (slide > 0){
+            if (acceleration > 0){
+                acceleration = 0;
+            }
+            slide+= acceleration;
+            acceleration -= .3;
+            if (slide < 0){
+                bounceCount++;
+            }
+            if (bounceCount >= 3){
+                bounceThreeTimes = false;
+                slide = 0;
+            }
         }
-        if (bounceCount >= 3){
-          bounceThreeTimes = false;
-          slide = 0;
+        
+        drawShop();
+        
+        if (frameCount % 60 == 0){
+            shopTime++;
         }
-      }
-      
-      rect((float)slide + 93.25, height/10, width * (6/8.0), height * (8.0/10));
-      rect((float)slide + 93.25-25, height/8, width * (8.0/10) + 12.5, height * (6/8.0)); //Overlapping rectangles with circles for a smoother shape
-      circle((float)slide + 93.25, height/8, 50);
-      circle((float)slide + 93.25, 7 * height/8, 50);
-      circle((float)(slide + 93.25 +562.5), 7 * height/8, 50);
-      circle((float)(slide + 93.25 +562.5), height/8, 50);
-      fill(#FFFFFF);
-      
-
-      rect((float)slide + 100, 150, 550, 250);
-      rect((float)slide + 100, 450, 250, 250);
-      rect((float)slide + 400, 450, 250, 250);
-      rect((float)slide + 100, 750, 250, 100);
-      rect((float)slide + 400, 750, 250, 100);
-      textSize(50);
-      fill(#000000);
-      text("SHOP", (float)(slide + 312.5), 140);
-      textSize(30);
-      text("INVENTORY", (float)(slide + 308), 390); 
-      textSize(40);
-      text("NEXT ROUND", (float)slide + 415, 812);
-      if (frameCount % 60 == 0){
-        shopTime++;
-      }
     }
+    
+}
+
+public void drawBanner() {
+    image(BANNER_SPRITE, 0, 300);
+    fill(#ffffff);
+    textSize(15);
+    text(int((player.position.y + player.size) / TILE_SIZE) + "m", 10, 320);
+}
+
+public void drawRoundTimer() {
+    fill(#a8a7a6);
+    rect(15, 15, 300, 20);
+    fill(#e95c50);
+    rect(18, 18, (float)(remainingTime / totalTime * 294), 14);
+}
+
+public void drawStopwatch(boolean stopped) {
+    textSize(40);
+    
+    if (stopped)
+        fill(#0394fc);
+    else
+        fill(#e95c50);
+    
+    String secondTime = "" + currSec;
+    String minTime = "" + currMin;
+    if (currSec < 10){
+        secondTime = "0" + currSec;
+    }
+    if (currMin < 10){
+        minTime = "0" + currMin;
+    }
+    
+    text("" + minTime + ":" + secondTime, width-150, 40);
+}
+
+public void drawShop() {
+    image(SHOP_SPRITE, (float)slide + 60, 350);
+    
+    // resources
+    for (int i = 0; i < resources.length; i++) {
+        fill(#000000);
+        textSize(20);
+        
+        float x = (float) slide + 130 + i * 80;
+        
+        
+        image(RESOURCE_SPRITES[i], x - 20, 380);
+        text(resources[i], x, 450);
+    }
+    
+    // play again button
+    textSize(15);
+    fill(#b5c76d);
+    rect((float)slide + 450, 600, 150, 30);
+    fill(#ffffff);
+    text("PLAY AGAIN", (float) slide + 470, 620);
+    
     
 }
 
@@ -324,41 +305,43 @@ public void drawGrid() {
     for (int i = 0; i < grid.length; i++) {
         int row = i / w;
         int col = i % w;
-      
+
         if (grid[i] == null) {
             fill(130, 114, 105);
             square(col * TILE_SIZE, row * TILE_SIZE - cameraOffset, TILE_SIZE);
             continue;
         }
-        
-        tint(constrain((int)((grid[i].health / grid[i].maxHealth) * 255), 175, 255));
-        image(grid[i].getSprite(), col * TILE_SIZE, row * TILE_SIZE - cameraOffset);
+
+        tint(constrain((int) ((grid[i].health / grid[i].maxHealth) * 255), 175, 255));
+        image(grid[i].sprite, col * TILE_SIZE, row * TILE_SIZE - cameraOffset);
     }
 }
 
 public void keyPressed() {
-  if (gamePaused == false && newRoundTrue == false){
-    if (key == 'a') leftPressed = true;
-    if (key == 'd') rightPressed = true;
-    if (key == 's') downPressed = true;
-  }
+    if (gamePaused == false && newRoundTrue == false) {
+        if (key == 'a')
+            leftPressed = true;
+        if (key == 'd')
+            rightPressed = true;
+        if (key == 's')
+            downPressed = true;
+    }
 }
 
-//public void restartGame(){
-  
-//}
-
-public void mouseClicked(){
-  if (mouseX > 400 && mouseX < 650 && mouseY > 750 && mouseY < 850 && gamePaused && shopTime > 2){
-    newRoundTrue = true;
-    gamePaused = false;
-  }
+public void mouseClicked() {
+    if (mouseX > 450 && mouseX < 600 && mouseY > 600 && mouseY < 630 && gamePaused && shopTime > 2) {
+        newRoundTrue = true;
+        gamePaused = false;
+    }
 }
 
 public void keyReleased() {
-  if (gamePaused == false){
-    if (key == 'a') leftPressed = false;
-    if (key == 'd') rightPressed = false;
-    if (key == 's') downPressed = false;
-  }
+    if (gamePaused == false) {
+        if (key == 'a')
+            leftPressed = false;
+        if (key == 'd')
+            rightPressed = false;
+        if (key == 's')
+            downPressed = false;
+    }
 }

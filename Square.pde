@@ -17,10 +17,6 @@ class Square {
         return health <= 0;
     }
 
-    public PImage getSprite() {
-        return sprite;
-    }
-
     public void breakSquare() {
         
     }

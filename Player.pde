@@ -73,10 +73,6 @@ class Player {
         }
     }
 
-    public PVector getPosition() {
-        return position;
-    }
-
     private void mine(boolean horizontal) {
         // this is pretty complicated but the basic idea is to check which tiles the player is overlapping with
         // we do this by defining the "bounding box" of the player, which is basically just the space that the player occupies
