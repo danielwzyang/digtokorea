@@ -322,7 +322,7 @@ public void draw() {
       }
     }
     //Depth recorder here
-    text((int)((player.getPosition().y + 24) / 30), 300, 100 );
+    text((int)((player.getPosition().y + 24) / TILE_SIZE), 300, 100 );
     
     
 }
