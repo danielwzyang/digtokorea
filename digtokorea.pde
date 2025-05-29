@@ -7,8 +7,8 @@ float cameraOffset;
 // Time gauging purpose
 int currSec;
 int currMin;
-double totalTime = 15;
-double remainingTime = 15;
+double maxTime;
+double remainingTime;
 
 // Game pause/shop phase
 boolean gamePaused = false;
@@ -93,6 +93,8 @@ public void setup() {
 
     font = createFont("pixelfont.ttf", 50);
     textFont(font);
+
+    maxTime = 10;
 }
 
 public void setupGrid() {
@@ -158,13 +160,14 @@ public void clayLayer() {
 public void draw() {
   
     if (newRoundTrue) {
-        grid = new Square[w*h];
-        setupGrid();
+        if (leftPressed|| rightPressed|| downPressed){
+          newRoundTrue = false;
+        }
+
         player = new Player();
         shopTime = 0;
-        remainingTime = totalTime;
+        remainingTime = maxTime;
         slide = -1000;
-        newRoundTrue = false;
         bounceCount = 0;
         bounceThreeTimes = true;
         acceleration = .1;
@@ -184,29 +187,27 @@ public void draw() {
     // depth banner
     drawBanner();
     
-    //Round timer
-    drawRoundTimer();
+    //Main game stopwatch
+    drawStopwatch(newRoundTrue);
     
+    //Round timer
+    drawRoundTimer(newRoundTrue); 
+
     //Tracking stopwatch and time remaining in the case of a continuing game
     if (gamePaused == false){ //DIGGING PHASE
         remainingTime -= (1.0/60); //60 to account for a 60fps game
         if (remainingTime < (0)){
             gamePaused = true;
         }
-        if (frameCount % 60 == 0){
+        if (frameCount % 60 == 0 && !newRoundTrue){
             currSec++;
             if (currSec > 60){
                 currSec = 0;
                 currMin++;
             }
-        }
-        //Main game stopwatch
-        drawStopwatch(false);
-        
+        }  
     }
-    else{ //SHOP PHASE
-        drawStopwatch(true);
-        
+    else{ //SHOP PHASE        
         //Creation of shop
 
         leftPressed = false;
@@ -249,11 +250,16 @@ public void drawBanner() {
     text(int((player.position.y + player.size) / TILE_SIZE) + "m", 10, 320);
 }
 
-public void drawRoundTimer() {
+public void drawRoundTimer(boolean stopped) {
     fill(#a8a7a6);
     rect(15, 15, 300, 20);
-    fill(#e95c50);
-    rect(18, 18, (float)(remainingTime / totalTime * 294), 14);
+    
+    if (stopped)
+        fill(#0394fc);
+    else
+        fill(#e95c50);
+    
+    rect(18, 18, (float)(remainingTime / maxTime * 294), 14);
 }
 
 public void drawStopwatch(boolean stopped) {
@@ -297,8 +303,6 @@ public void drawShop() {
     rect((float)slide + 450, 600, 150, 30);
     fill(#ffffff);
     text("PLAY AGAIN", (float) slide + 470, 620);
-    
-    
 }
 
 public void drawGrid() {
@@ -318,7 +322,7 @@ public void drawGrid() {
 }
 
 public void keyPressed() {
-    if (gamePaused == false && newRoundTrue == false) {
+    if (gamePaused == false) {
         if (key == 'a')
             leftPressed = true;
         if (key == 'd')
@@ -330,6 +334,7 @@ public void keyPressed() {
 
 public void mouseClicked() {
     if (mouseX > 450 && mouseX < 600 && mouseY > 600 && mouseY < 630 && gamePaused && shopTime > 2) {
+        setupGrid();
         newRoundTrue = true;
         gamePaused = false;
     }
