@@ -43,11 +43,14 @@ int[] SQUARE_HEALTH = { 15, 30, 60 };
 
 // sprites
 PImage BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE;
-PImage[] RESOURCE_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES;
+PImage[] UPGRADE_SPRITES, RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES, TITANIUM_SPRITES;
 
 int[] resources = { 0, 0, 0, 0 };
 
-PFont font;
+int[] MINING_SPEEDS = { 1, 2, 3, 4, 5 };
+int miningIndex = 0;
+
+
 
 public void setup() {
     size(750, 1000);
@@ -60,11 +63,20 @@ public void setup() {
     DIRT_SPRITE = loadImage("sprites/dirt.png");
     CLAY_SPRITE = loadImage("sprites/clay.png");
     
+    UPGRADE_SPRITES = new PImage[] {
+        loadImage("sprites/miningspeed.png"),
+    };
+    
     RESOURCE_SPRITES = new PImage[] {
         loadImage("sprites/coal.png"),
         loadImage("sprites/iron.png"),
         loadImage("sprites/gold.png"),
-        loadImage("sprites/coal.png"),
+        loadImage("sprites/titanium.png"),
+    };
+    
+    CLOCK_SPRITES = new PImage[] {
+        loadImage("sprites/dirt_clock.png"),
+        loadImage("sprites/clay_clock.png"),
     };
 
     COAL_SPRITES = new PImage[] {
@@ -81,6 +93,11 @@ public void setup() {
         loadImage("sprites/dirt_gold.png"),
         loadImage("sprites/clay_gold.png"),
     };
+    
+    TITANIUM_SPRITES = new PImage[] {
+        null,
+        loadImage("sprites/clay_titanium.png"),
+    };
 
     TILE_SIZE = 30;
     w = 30;
@@ -90,8 +107,9 @@ public void setup() {
     setupGrid();
 
     player = new Player();
+    player.damage = MINING_SPEEDS[miningIndex];
 
-    font = createFont("pixelfont.ttf", 50);
+    PFont font = createFont("pixelfont.ttf", 50);
     textFont(font);
 
     maxTime = 10;
@@ -114,7 +132,7 @@ public void dirtLayer() {
     }
     
     // iron randomly dispersed
-    for (int i = 0; i < 30; i++) {
+    for (int i = 0; i < 50; i++) {
         grid[int(random(50 * w))] = new Iron(0);
     }
     
@@ -147,13 +165,18 @@ public void clayLayer() {
     }
     
     // iron randomly dispersed
-    for (int i = 0; i < 30; i++) {
+    for (int i = 0; i < 50; i++) {
         grid[50 * w + int(random(50 * w))] = new Iron(1);
     }
     
     // gold randomly dispersed
     for (int i = 0; i < 50; i++) {
         grid[50 * w + int(random(50 * w))] = new Gold(1);
+    }
+    
+    // titanium randomly dispersed
+    for (int i = 0; i < 50; i++) {
+        grid[50 * w + int(random(50 * w))] = new Titanium(1);
     }
 }
 
@@ -188,10 +211,10 @@ public void draw() {
     drawBanner();
     
     //Main game stopwatch
-    drawStopwatch(newRoundTrue);
+    drawStopwatch(newRoundTrue || gamePaused);
     
     //Round timer
-    drawRoundTimer(newRoundTrue); 
+    drawRoundTimer(newRoundTrue || gamePaused); 
 
     //Tracking stopwatch and time remaining in the case of a continuing game
     if (gamePaused == false){ //DIGGING PHASE
@@ -290,12 +313,20 @@ public void drawShop() {
         fill(#000000);
         textSize(20);
         
-        float x = (float) slide + 130 + i * 80;
+        float x = (float) slide + 100 + i * 60;
         
         
-        image(RESOURCE_SPRITES[i], x - 20, 380);
-        text(resources[i], x, 450);
+        image(RESOURCE_SPRITES[i], x, 360);
+        text(resources[i], x + 15, 420);
     }
+    
+    // upgrades
+    text("UPGRADES", (float) slide + 110, 460);
+    
+    // mining speed upgrade
+    fill(#ffffff);
+    image(UPGRADE_SPRITES[0], (float) slide + 110, 480);
+    
     
     // play again button
     textSize(15);
@@ -316,7 +347,7 @@ public void drawGrid() {
             continue;
         }
 
-        tint(constrain((int) ((grid[i].health / grid[i].maxHealth) * 255), 175, 255));
+        tint((int)(grid[i].health / grid[i].maxHealth * 80 + (255-80)));
         image(grid[i].sprite, col * TILE_SIZE, row * TILE_SIZE - cameraOffset);
     }
 }
@@ -333,10 +364,19 @@ public void keyPressed() {
 }
 
 public void mouseClicked() {
-    if (mouseX > 450 && mouseX < 600 && mouseY > 600 && mouseY < 630 && gamePaused && shopTime > 2) {
-        setupGrid();
-        newRoundTrue = true;
-        gamePaused = false;
+    // only time we need mouse clicks are when we're in the shop
+    if (gamePaused && shopTime > 2) {
+        // continue game
+        if (mouseX > 450 && mouseX < 600 && mouseY > 600 && mouseY < 630) {
+            setupGrid();
+            newRoundTrue = true;
+            gamePaused = false;
+        }
+        
+        // select mining upgrade
+        if (mouseX > 110 && mouseX < 150 && mouseY > 480 && mouseY < 520) {
+            println("mining upgrade");
+        }
     }
 }
 
