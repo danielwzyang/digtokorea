@@ -16,11 +16,11 @@ class Player {
         // handle movement for left and right
         velocity.x = 0;
         if (leftPressed) {
-            velocity.x = -1.5;
+            velocity.x = -3;
             mirror = true;
         }
         if (rightPressed) {
-            velocity.x = 1.5;
+            velocity.x = 3;
             mirror = false;
         }
 
