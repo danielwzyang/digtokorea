@@ -140,6 +140,11 @@ public void dirtLayer() {
     for (int i = 0; i < 50; i++) {
         grid[int(random(50 * w))] = new Gold(0);
     }
+    
+    // Clocks randomly dispersed
+    for (int i = 0; i < 10; i++) {
+        grid[int(random(50 * w))] = new Clock(0);
+    }
 }
 
 public void clayLayer() {
@@ -177,6 +182,11 @@ public void clayLayer() {
     // titanium randomly dispersed
     for (int i = 0; i < 50; i++) {
         grid[50 * w + int(random(50 * w))] = new Titanium(1);
+    }
+    
+    // Clocks randomly dispersed
+    for (int i = 0; i < 50; i++) {
+        grid[50 * w + int(random(50 * w))] = new Clock(1);
     }
 }
 
