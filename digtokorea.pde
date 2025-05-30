@@ -39,13 +39,13 @@ final int GOLD = 2;
 final int TITANIUM = 3;
 
 // health for each square by layer
-int[] SQUARE_HEALTH = { 15, 30, 60 };
+int[] SQUARE_HEALTH = { 20, 40, 80 };
 
 // sprites
 PImage BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE;
 PImage[] RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES, TITANIUM_SPRITES;
 
-int[] resources = { 10, 10, 0, 0 };
+int[] resources = { 0, 0, 0, 0 };
 
 Upgrade[] upgrades;
 
@@ -104,22 +104,22 @@ public void setup() {
     PFont font = createFont("pixelfont.ttf", 50);
     textFont(font);
 
-    maxTime = 0.1;
+    maxTime = 10;
     
     upgrades = new Upgrade[]{
         new MiningUpgrade(new int[]{1, 2, 3, 4, 5}, new int[][]{
             null,
-            {10, 10, 0, 0},
-            {0, 15, 15, 0},
-            {0, 10, 20, 10},
-            {0, 0, 20, 30},
+            {20, 10, 0, 0},
+            {10, 15, 15, 0},
+            {0, 20, 30, 10},
+            {0, 0, 40, 20},
         }),
         new TimeUpgrade(new int[]{10, 15, 20, 30, 45}, new int[][]{
             null,
-            {10, 10, 0, 0},
-            {0, 15, 15, 0},
-            {0, 10, 20, 10},
-            {0, 0, 20, 30},
+            {15, 15, 0, 0},
+            {10, 20, 10, 0},
+            {0, 10, 30, 20},
+            {0, 0, 30, 30},
         }),
     };
 }
@@ -404,14 +404,12 @@ public void mouseClicked() {
         
         // mining upgrade
         if (mouseX > 380 && mouseX < 430 && mouseY > 400 && mouseY < 430) {
-            println("mine");
             if (upgrades[0].canAfford())
                 upgrades[0].upgrade();
         }
         
         // time upgrade
         if (mouseX > 380 && mouseX < 430 && mouseY > 500 && mouseY < 530) {
-            println("time");
             if (upgrades[1].canAfford())
                 upgrades[1].upgrade();
         }
