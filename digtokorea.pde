@@ -43,14 +43,11 @@ int[] SQUARE_HEALTH = { 15, 30, 60 };
 
 // sprites
 PImage BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE;
-PImage[] UPGRADE_SPRITES, RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES, TITANIUM_SPRITES;
+PImage[] RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES, TITANIUM_SPRITES;
 
-int[] resources = { 0, 0, 0, 0 };
+int[] resources = { 10, 10, 0, 0 };
 
-int[] MINING_SPEEDS = { 1, 2, 3, 4, 5 };
-int miningIndex = 0;
-
-
+Upgrade[] upgrades;
 
 public void setup() {
     size(750, 1000);
@@ -62,10 +59,6 @@ public void setup() {
 
     DIRT_SPRITE = loadImage("sprites/dirt.png");
     CLAY_SPRITE = loadImage("sprites/clay.png");
-    
-    UPGRADE_SPRITES = new PImage[] {
-        loadImage("sprites/miningspeed.png"),
-    };
     
     RESOURCE_SPRITES = new PImage[] {
         loadImage("sprites/coal.png"),
@@ -107,12 +100,28 @@ public void setup() {
     setupGrid();
 
     player = new Player();
-    player.damage = MINING_SPEEDS[miningIndex];
 
     PFont font = createFont("pixelfont.ttf", 50);
     textFont(font);
 
-    maxTime = 10;
+    maxTime = 0.1;
+    
+    upgrades = new Upgrade[]{
+        new MiningUpgrade(new int[]{1, 2, 3, 4, 5}, new int[][]{
+            null,
+            {10, 10, 0, 0},
+            {0, 15, 15, 0},
+            {0, 10, 20, 10},
+            {0, 0, 20, 30},
+        }),
+        new TimeUpgrade(new int[]{10, 15, 20, 30, 45}, new int[][]{
+            null,
+            {10, 10, 0, 0},
+            {0, 15, 15, 0},
+            {0, 10, 20, 10},
+            {0, 0, 20, 30},
+        }),
+    };
 }
 
 public void setupGrid() {
@@ -187,7 +196,8 @@ public void draw() {
           newRoundTrue = false;
         }
 
-        player = new Player();
+        player.position = new PVector(width/2, -2);
+
         shopTime = 0;
         remainingTime = maxTime;
         slide = -1000;
@@ -308,32 +318,51 @@ public void drawStopwatch(boolean stopped) {
 public void drawShop() {
     image(SHOP_SPRITE, (float)slide + 60, 350);
     
+    fill(#ffffff);
+
     // resources
     for (int i = 0; i < resources.length; i++) {
-        fill(#000000);
         textSize(20);
         
-        float x = (float) slide + 100 + i * 60;
+        float y = 380 + i * 60;
         
-        
-        image(RESOURCE_SPRITES[i], x, 360);
-        text(resources[i], x + 15, 420);
+        image(RESOURCE_SPRITES[i], (float) slide + 530, y);
+        text(resources[i], (float) slide + 580, y + 25);
     }
     
-    // upgrades
-    text("UPGRADES", (float) slide + 110, 460);
-    
     // mining speed upgrade
-    fill(#ffffff);
-    image(UPGRADE_SPRITES[0], (float) slide + 110, 480);
+    for (int i = 0; i < upgrades.length; i++) {
+        int yOffset = i * 100;
+        textSize(15);
+        text(upgrades[i].name, (float) slide + 120, 380 + yOffset);
+        for (int j = 0; j < resources.length; j++) {
+            textSize(15);
+            
+            float x = (float) slide + 120 + j * 60;
+            
+            image(RESOURCE_SPRITES[j], x, 390 + yOffset);
+            text(upgrades[i].getPrice()[j], x + 15, 450 + yOffset);
+        }
+        
+        textSize(15);
+        
+        if (upgrades[i].canAfford())
+            fill(#b5c76d);
+        else
+            fill(#d1263c);
+        
+        rect((float)slide + 380, 400 + yOffset, 50, 30);
+        fill(#ffffff);
+        text("BUY", (float) slide + 390, 420 + yOffset); 
+    }
     
     
     // play again button
     textSize(15);
-    fill(#b5c76d);
-    rect((float)slide + 450, 600, 150, 30);
+    fill(#3db1eb);
+    rect((float)slide + 120, 600, 60, 30);
     fill(#ffffff);
-    text("PLAY AGAIN", (float) slide + 470, 620);
+    text("PLAY", (float) slide + 130, 620);
 }
 
 public void drawGrid() {
@@ -365,17 +394,26 @@ public void keyPressed() {
 
 public void mouseClicked() {
     // only time we need mouse clicks are when we're in the shop
-    if (gamePaused && shopTime > 2) {
+    if (gamePaused && shopTime > 1) {
         // continue game
-        if (mouseX > 450 && mouseX < 600 && mouseY > 600 && mouseY < 630) {
+        if (mouseX > 120 && mouseX < 180 && mouseY > 600 && mouseY < 630) {
             setupGrid();
             newRoundTrue = true;
             gamePaused = false;
         }
         
-        // select mining upgrade
-        if (mouseX > 110 && mouseX < 150 && mouseY > 480 && mouseY < 520) {
-            println("mining upgrade");
+        // mining upgrade
+        if (mouseX > 380 && mouseX < 430 && mouseY > 400 && mouseY < 430) {
+            println("mine");
+            if (upgrades[0].canAfford())
+                upgrades[0].upgrade();
+        }
+        
+        // time upgrade
+        if (mouseX > 380 && mouseX < 430 && mouseY > 500 && mouseY < 530) {
+            println("time");
+            if (upgrades[1].canAfford())
+                upgrades[1].upgrade();
         }
     }
 }
