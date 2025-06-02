@@ -42,7 +42,7 @@ final int TITANIUM = 3;
 int[] SQUARE_HEALTH = { 20, 40, 80 };
 
 // sprites
-<<<<<<< HEAD
+
 PImage BANNER_SPRITE, RECORD_BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE;
 PImage[] UPGRADE_SPRITES, RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES, TITANIUM_SPRITES;
 
@@ -55,15 +55,7 @@ int miningIndex = 0;
 int record;
 int currDepth = int((player.position.y + player.size) / TILE_SIZE);
 
-
-=======
-PImage BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE;
-PImage[] RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES, TITANIUM_SPRITES;
-
-int[] resources = { 0, 0, 0, 0 };
-
 Upgrade[] upgrades;
->>>>>>> main
 
 public void setup() {
     size(750, 1000);
