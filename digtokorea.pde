@@ -109,14 +109,14 @@ public void setup() {
     upgrades = new Upgrade[]{
         new MiningUpgrade(new int[]{1, 2, 3, 4, 5}, new int[][]{
             null,
-            {20, 10, 0, 0},
+            {5, 10, 0, 0},
             {10, 15, 15, 0},
             {0, 20, 30, 10},
             {0, 0, 40, 20},
         }),
         new TimeUpgrade(new int[]{10, 15, 20, 30, 45}, new int[][]{
             null,
-            {15, 15, 0, 0},
+            {10, 5, 0, 0},
             {10, 20, 10, 0},
             {0, 10, 30, 20},
             {0, 0, 30, 30},
