@@ -53,7 +53,8 @@ int miningIndex = 0;
 
 //Max depth for record keeping
 int record;
-int currDepth = int((player.position.y + player.size) / TILE_SIZE);
+int currDepth;
+double accurateDepth; //This essentially subtracts to ensure that the recordTracker stays in place relative to the moving map
 
 Upgrade[] upgrades;
 
@@ -131,6 +132,9 @@ public void setup() {
             {0, 0, 30, 30},
         }),
     };
+    //Depth and record
+    currDepth = int((player.position.y + player.size) / TILE_SIZE);
+    record = currDepth;
 }
 
 public void setupGrid() {
@@ -208,7 +212,10 @@ public void clayLayer() {
     }
 }
 
+
+
 public void draw() {
+  
   
     if (newRoundTrue) {
         if (leftPressed|| rightPressed|| downPressed){
@@ -235,13 +242,21 @@ public void draw() {
     player.draw();
     
     fill(0, 0, 0);
+
+    // depth banner
+    //currDepth
+    currDepth = int((player.position.y + player.size) / TILE_SIZE);
+    accurateDepth = (player.position.y + player.size) / TILE_SIZE;
     
-    // depth banner and max Tracker
     drawBanner();
-    if (currDepth >= record){
+    if (currDepth < record){
+      drawBannerRecord();
+    }
+    else{ // (currDepth >= record)
       record = currDepth;
     }
-    drawBannerRecord();
+    
+    
     
     //Main game stopwatch
     drawStopwatch(newRoundTrue || gamePaused);
@@ -300,17 +315,28 @@ public void draw() {
 }
 
 public void drawBanner() {
-    image(BANNER_SPRITE, 0, 300);
+    if (currDepth >= record){
+      image(RECORD_BANNER_SPRITE, 0, 330);
+      textSize(7);
+      text("New", 10, 338);
+      text("Record!", 10, 357);
+    }
+    else{
+      image(BANNER_SPRITE, 0, 330);
+    }
     fill(#ffffff);
     textSize(15);
-    text(currDepth + "m", 10, 320);
+    text(currDepth + "m", 10, 350);
 }
 
 public void drawBannerRecord() {
-    image(RECORD_BANNER_SPRITE, 0, record);
+    image(RECORD_BANNER_SPRITE, 0, 330 + (float)((float)record - accurateDepth) * TILE_SIZE);
     fill(#ffffff);
     textSize(15);
-    text(record + "m", 10, 320);
+    text(record + "m", 10, 350 + (float)((float)record-accurateDepth) * TILE_SIZE);
+    textSize(7);
+    text("Current", 10, 338 + (float)((float)record - accurateDepth) * TILE_SIZE);
+    text("Record", 10, 357 + (float)((float)record - accurateDepth) * TILE_SIZE);
 }
 
 public void drawRoundTimer(boolean stopped) {
