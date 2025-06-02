@@ -24,6 +24,10 @@ class Upgrade {
     }
     
     public boolean canAfford() {
+        if (currentIndex == prices.length - 1) {
+            return false;
+        }
+      
         int[] price = prices[currentIndex + 1];
         for (int resource = 0; resource < price.length; resource++) {
             if (resources[resource] < price[resource]) 

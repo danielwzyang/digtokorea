@@ -2,7 +2,7 @@ class Player {
     private PVector position;
     private PVector velocity;
     private float size = TILE_SIZE * 0.8;
-    private int damage = 1;
+    private int damage = 10;
     private boolean mirror;
     private float pickaxeSwingAngle = 0;
     private float pickaxeSwingSpeed = 0.2;

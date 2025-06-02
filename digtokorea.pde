@@ -39,16 +39,16 @@ final int GOLD = 2;
 final int TITANIUM = 3;
 
 // health for each square by layer
-int[] SQUARE_HEALTH = { 20, 40, 80 };
+int[] SQUARE_HEALTH = { 30, 60, 90 };
 
 // sprites
 
-PImage BANNER_SPRITE, RECORD_BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE;
+PImage BANNER_SPRITE, RECORD_BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE, STONE_SPRITE;
 PImage[] UPGRADE_SPRITES, RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES, TITANIUM_SPRITES;
 
-int[] resources = { 0, 0, 0, 0 };
+int[] resources = { 1000, 1000, 1000, 1000 };
 
-int[] MINING_SPEEDS = { 1, 2, 3, 4, 5 };
+int[] MINING_SPEEDS = { 2, 3, 4, 5, 6 };
 int miningIndex = 0;
 
 //Max depth for record keeping
@@ -69,6 +69,7 @@ public void setup() {
 
     DIRT_SPRITE = loadImage("sprites/dirt.png");
     CLAY_SPRITE = loadImage("sprites/clay.png");
+    STONE_SPRITE = loadImage("sprites/stone.png");
     
     RESOURCE_SPRITES = new PImage[] {
         loadImage("sprites/coal.png"),
@@ -80,6 +81,7 @@ public void setup() {
     CLOCK_SPRITES = new PImage[] {
         loadImage("sprites/dirt_clock.png"),
         loadImage("sprites/clay_clock.png"),
+        loadImage("sprites/stone_clock.png"),
     };
 
     COAL_SPRITES = new PImage[] {
@@ -90,21 +92,24 @@ public void setup() {
     IRON_SPRITES = new PImage[] {
         loadImage("sprites/dirt_iron.png"),
         loadImage("sprites/clay_iron.png"),
+        loadImage("sprites/stone_iron.png"),
     };
 
     GOLD_SPRITES = new PImage[] {
         loadImage("sprites/dirt_gold.png"),
         loadImage("sprites/clay_gold.png"),
+        loadImage("sprites/stone_gold.png"),
     };
     
     TITANIUM_SPRITES = new PImage[] {
         null,
         loadImage("sprites/clay_titanium.png"),
+        loadImage("sprites/stone_titanium.png"),
     };
 
     TILE_SIZE = 30;
     w = 30;
-    h = 300;
+    h = 200;
 
     grid = new Square[w * h];
     setupGrid();
@@ -117,7 +122,7 @@ public void setup() {
     maxTime = 10;
     
     upgrades = new Upgrade[]{
-        new MiningUpgrade(new int[]{1, 2, 3, 4, 5}, new int[][]{
+        new MiningUpgrade(new int[]{2, 3, 4, 5, 6}, new int[][]{
             null,
             {5, 10, 0, 0},
             {10, 15, 15, 0},
@@ -140,31 +145,32 @@ public void setup() {
 public void setupGrid() {
     dirtLayer();
     clayLayer();
+    stoneLayer();
 }
 
 public void dirtLayer() {
     // rows of dirt
-    for (int i = 0; i < 50 * w; i++) {
+    for (int i = 0; i < 100 * w; i++) {
         grid[i] = new Dirt();
     }
     
     // coal randomly dispersed
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 100; i++) {
         grid[int(random(50 * w))] = new Coal(0);
     }
     
     // iron randomly dispersed
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 100; i++) {
         grid[int(random(50 * w))] = new Iron(0);
     }
     
     // gold randomly dispersed
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 100; i++) {
         grid[int(random(50 * w))] = new Gold(0);
     }
     
     // Clocks randomly dispersed
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 10; i++) {
         grid[int(random(50 * w))] = new Clock(0);
     }
 }
@@ -187,31 +193,68 @@ public void clayLayer() {
     }
     
     // coal randomly dispersed
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 100; i++) {
         grid[50 * w + int(random(50 * w))] = new Coal(1);
     }
     
     // iron randomly dispersed
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 100; i++) {
         grid[50 * w + int(random(50 * w))] = new Iron(1);
     }
     
     // gold randomly dispersed
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 100; i++) {
         grid[50 * w + int(random(50 * w))] = new Gold(1);
     }
     
     // titanium randomly dispersed
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 100; i++) {
         grid[50 * w + int(random(50 * w))] = new Titanium(1);
     }
     
     // Clocks randomly dispersed
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 10; i++) {
         grid[50 * w + int(random(50 * w))] = new Clock(1);
     }
 }
 
+public void stoneLayer() {
+    // spots of clay in dirt layer with increasing densities
+    for (int i = 0; i < 20; i++) {
+        grid[int(random(10 * w)) + 90 * w] = new Stone();
+    }
+    for (int i = 0; i < 20; i++) {
+        grid[int(random(5 * w)) + 95 * w] = new Stone();
+    }
+    for (int i = 0; i < 20; i++) {
+        grid[int(random(2 * w)) + 98 * w] = new Stone();
+    }
+  
+    // rows of stone
+    for (int i = 100 * w; i < 200 * w; i++) {
+        grid[i] = new Stone();
+    }
+    
+    // iron randomly dispersed
+    for (int i = 0; i < 200; i++) {
+        grid[100 * w + int(random(100 * w))] = new Iron(2);
+    }
+    
+    // gold randomly dispersed
+    for (int i = 0; i < 200; i++) {
+        grid[100 * w + int(random(100 * w))] = new Gold(2);
+    }
+    
+    // titanium randomly dispersed
+    for (int i = 0; i < 200; i++) {
+        grid[100 * w + int(random(100 * w))] = new Titanium(2);
+    }
+    
+    // Clocks randomly dispersed
+    for (int i = 0; i < 20; i++) {
+        grid[100 * w + int(random(100 * w))] = new Clock(2);
+    }
+}
 
 
 public void draw() {
@@ -315,22 +358,17 @@ public void draw() {
 }
 
 public void drawBanner() {
-    if (currDepth >= record){
-      image(RECORD_BANNER_SPRITE, 0, 330);
-    }
-    else{
-      image(BANNER_SPRITE, 0, 330);
-    }
+    image(currDepth >= record ? RECORD_BANNER_SPRITE : BANNER_SPRITE, 0, 370);
     fill(#ffffff);
     textSize(15);
-    text(currDepth + "m", 10, 350);
+    text(currDepth + "m", 10, 390);
 }
 
 public void drawBannerRecord() {
-    image(RECORD_BANNER_SPRITE, 0, 330 + (float)((float)record - accurateDepth) * TILE_SIZE);
+    image(RECORD_BANNER_SPRITE, 0, 370 + (float)((float)record - accurateDepth) * TILE_SIZE);
     fill(#ffffff);
     textSize(15);
-    text(record + "m", 10, 350 + (float)((float)record-accurateDepth) * TILE_SIZE);
+    text(record + "m", 10, 390 + (float)((float)record-accurateDepth) * TILE_SIZE);
 }
 
 public void drawRoundTimer(boolean stopped) {
@@ -384,26 +422,32 @@ public void drawShop() {
     for (int i = 0; i < upgrades.length; i++) {
         int yOffset = i * 100;
         textSize(15);
+        fill(#ffffff);
         text(upgrades[i].name, (float) slide + 120, 380 + yOffset);
-        for (int j = 0; j < resources.length; j++) {
+        if (upgrades[i].getPrice() != null) {
+            for (int j = 0; j < resources.length; j++) {
+                textSize(15);
+                
+                float x = (float) slide + 120 + j * 60;
+                
+                image(RESOURCE_SPRITES[j], x, 390 + yOffset);
+                text(upgrades[i].getPrice()[j], x + 15, 450 + yOffset);
+            }
+            
             textSize(15);
             
-            float x = (float) slide + 120 + j * 60;
+            if (upgrades[i].canAfford())
+                fill(#b5c76d);
+            else
+                fill(#d1263c);
             
-            image(RESOURCE_SPRITES[j], x, 390 + yOffset);
-            text(upgrades[i].getPrice()[j], x + 15, 450 + yOffset);
+            rect((float)slide + 380, 400 + yOffset, 50, 30);
+            fill(#ffffff);
+            text("BUY", (float) slide + 390, 420 + yOffset); 
+        } else {
+            fill(#f56942);
+            text("MAXED OUT", (float) slide + 120, 410 + yOffset);
         }
-        
-        textSize(15);
-        
-        if (upgrades[i].canAfford())
-            fill(#b5c76d);
-        else
-            fill(#d1263c);
-        
-        rect((float)slide + 380, 400 + yOffset, 50, 30);
-        fill(#ffffff);
-        text("BUY", (float) slide + 390, 420 + yOffset); 
     }
     
     
