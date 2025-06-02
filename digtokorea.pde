@@ -42,7 +42,7 @@ final int TITANIUM = 3;
 int[] SQUARE_HEALTH = { 15, 30, 60 };
 
 // sprites
-PImage BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE;
+PImage BANNER_SPRITE, RECORD_BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE;
 PImage[] UPGRADE_SPRITES, RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES, TITANIUM_SPRITES;
 
 int[] resources = { 0, 0, 0, 0 };
@@ -50,12 +50,17 @@ int[] resources = { 0, 0, 0, 0 };
 int[] MINING_SPEEDS = { 1, 2, 3, 4, 5 };
 int miningIndex = 0;
 
+//Max depth for record keeping
+int record;
+int currDepth = int((player.position.y + player.size) / TILE_SIZE);
+
 
 
 public void setup() {
     size(750, 1000);
 
     BANNER_SPRITE = loadImage("sprites/banner.png");
+    RECORD_BANNER_SPRITE = loadImage("sprites/record_banner.png");
     SHOP_SPRITE = loadImage("sprites/shop.png");
     PLAYER_SPRITE = loadImage("sprites/player.png");
     PICKAXE_SPRITE = loadImage("sprites/pickaxe.png");
@@ -142,7 +147,7 @@ public void dirtLayer() {
     }
     
     // Clocks randomly dispersed
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 5; i++) {
         grid[int(random(50 * w))] = new Clock(0);
     }
 }
@@ -185,7 +190,7 @@ public void clayLayer() {
     }
     
     // Clocks randomly dispersed
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 5; i++) {
         grid[50 * w + int(random(50 * w))] = new Clock(1);
     }
 }
@@ -217,8 +222,12 @@ public void draw() {
     
     fill(0, 0, 0);
     
-    // depth banner
+    // depth banner and max Tracker
     drawBanner();
+    if (currDepth >= record){
+      record = currDepth;
+    }
+    drawBannerRecord();
     
     //Main game stopwatch
     drawStopwatch(newRoundTrue || gamePaused);
@@ -280,7 +289,14 @@ public void drawBanner() {
     image(BANNER_SPRITE, 0, 300);
     fill(#ffffff);
     textSize(15);
-    text(int((player.position.y + player.size) / TILE_SIZE) + "m", 10, 320);
+    text(currDepth + "m", 10, 320);
+}
+
+public void drawBannerRecord() {
+    image(RECORD_BANNER_SPRITE, 0, record);
+    fill(#ffffff);
+    textSize(15);
+    text(record + "m", 10, 320);
 }
 
 public void drawRoundTimer(boolean stopped) {
@@ -387,6 +403,12 @@ public void mouseClicked() {
         if (mouseX > 110 && mouseX < 150 && mouseY > 480 && mouseY < 520) {
             println("mining upgrade");
         }
+        
+        /*if ()
+        
+        
+        
+        */
     }
 }
 
