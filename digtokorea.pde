@@ -317,9 +317,6 @@ public void draw() {
 public void drawBanner() {
     if (currDepth >= record){
       image(RECORD_BANNER_SPRITE, 0, 330);
-      textSize(7);
-      text("New", 10, 338);
-      text("Record!", 10, 357);
     }
     else{
       image(BANNER_SPRITE, 0, 330);
@@ -334,9 +331,6 @@ public void drawBannerRecord() {
     fill(#ffffff);
     textSize(15);
     text(record + "m", 10, 350 + (float)((float)record-accurateDepth) * TILE_SIZE);
-    textSize(7);
-    text("Current", 10, 338 + (float)((float)record - accurateDepth) * TILE_SIZE);
-    text("Record", 10, 357 + (float)((float)record - accurateDepth) * TILE_SIZE);
 }
 
 public void drawRoundTimer(boolean stopped) {
