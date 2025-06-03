@@ -15,6 +15,19 @@ boolean gamePaused = false;
 boolean gameStart = false;
 double shopTime = 0;
 
+// Title Screen
+boolean titleScreen;
+int bounceText;
+boolean goDown;
+int[] instructions = {0,1,2,3,4};
+int currPage;
+boolean tinting = false;
+int currTint;
+int tintTime;
+
+//instructions
+boolean[] onPage = {true, false, false, false, false};
+
 // Restart game phase
 boolean newRoundTrue = true;
 
@@ -48,8 +61,8 @@ PImage[] UPGRADE_SPRITES, RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SP
 
 int[] resources = { 1000, 1000, 1000, 1000 };
 
-int[] MINING_SPEEDS = { 2, 3, 4, 5, 6 };
-int miningIndex = 0;
+//int[] MINING_SPEEDS = { 2, 3, 4, 5, 6 };
+//int miningIndex = 0;
 
 //Max depth for record keeping
 int record;
@@ -59,7 +72,7 @@ double accurateDepth; //This essentially subtracts to ensure that the recordTrac
 Upgrade[] upgrades;
 
 public void setup() {
-    size(750, 1000);
+    size(750, 5000);
 
     BANNER_SPRITE = loadImage("sprites/banner.png");
     RECORD_BANNER_SPRITE = loadImage("sprites/record_banner.png");
@@ -140,6 +153,19 @@ public void setup() {
     //Depth and record
     currDepth = int((player.position.y + player.size) / TILE_SIZE);
     record = currDepth;
+    
+    //To create a titleScreen + instructions
+    bounceText = 400;
+    currTint = 255;
+    currPage = 0;
+    titleScreen = true;
+    drawGrid();
+    saveFrame("full.jpg");
+    drawTitleScreen();
+    windowResize(750, 1000);
+    setupGrid();
+    drawGrid();
+ 
 }
 
 public void setupGrid() {
@@ -258,104 +284,206 @@ public void stoneLayer() {
 
 
 public void draw() {
+    //Tracking correct damage amount
+    player.damage = upgrades[0].getValue();
+    if (titleScreen){
+      image(loadImage("full.jpg"), 0, 0); //dirt layer
+      loadImage("full.jpg");
+      tint(currTint);
+      image(loadImage("full.jpg").get(0,1350,750,420), 0, 150); //clay layer
+      tint(currTint);
+      image(loadImage("full.jpg").get(0,2790,750,520), 0, 480); //stone layer
+      if (tinting){
+        currTint--;
+        if (currTint == 0){
+          tinting = false;
+        }
+      }
+      else{
+        if (currTint < 255){
+          currTint++;
+        }
+      }
+      if (onPage[0]){
+        drawTitleScreen();
+      }
+      else if (onPage[1]){
+        drawPage1();
+      }
+      else if (onPage[2]){
+        drawPage2();
+      }
+      else if (onPage[3]){
+        drawPage3();
+      }
+      else if (onPage[4]){
+        drawPage4();
+      }
+    }
+    else{
+      if (newRoundTrue) {
+          if (leftPressed|| rightPressed|| downPressed){
+            newRoundTrue = false;
+          }
   
+          player.position = new PVector(width/2, -2);
   
-    if (newRoundTrue) {
-        if (leftPressed|| rightPressed|| downPressed){
-          newRoundTrue = false;
-        }
-
-        player.position = new PVector(width/2, -2);
-
-        shopTime = 0;
-        remainingTime = maxTime;
-        slide = -1000;
-        bounceCount = 0;
-        bounceThreeTimes = true;
-        acceleration = .1;
-    }
+          shopTime = 0;
+          remainingTime = maxTime;
+          slide = -1000;
+          bounceCount = 0;
+          bounceThreeTimes = true;
+          acceleration = .1;
+      }
+    
+      background(161, 211, 255);
+      
+      player.move();
+      cameraOffset = player.position.y - height/3;
+      
+      drawGrid();
   
-    background(161, 211, 255);
-    
-    player.move();
-    cameraOffset = player.position.y - height/3;
-    
-    drawGrid();
-
-    player.draw();
-    
-    fill(0, 0, 0);
-
-    // depth banner
-    //currDepth
-    currDepth = int((player.position.y + player.size) / TILE_SIZE);
-    accurateDepth = (player.position.y + player.size) / TILE_SIZE;
-    
-    drawBanner();
-    if (currDepth < record){
-      drawBannerRecord();
+      player.draw();
+      
+      fill(0, 0, 0);
+  
+      // depth banner
+      //currDepth
+      currDepth = int((player.position.y + player.size) / TILE_SIZE);
+      accurateDepth = (player.position.y + player.size) / TILE_SIZE;
+      
+      drawBanner();
+      if (currDepth < record){
+        drawBannerRecord();
+      }
+      else{ // (currDepth >= record)
+        record = currDepth;
+      }
+      
+      
+      
+      //Main game stopwatch
+      drawStopwatch(newRoundTrue || gamePaused);
+      
+      //Round timer
+      drawRoundTimer(newRoundTrue || gamePaused); 
+  
+      //Tracking stopwatch and time remaining in the case of a continuing game
+      if (gamePaused == false){ //DIGGING PHASE
+          remainingTime -= (1.0/60); //60 to account for a 60fps game
+          if (remainingTime < (0)){
+              gamePaused = true;
+          }
+          if (frameCount % 60 == 0 && !newRoundTrue){
+              currSec++;
+              if (currSec > 60){
+                  currSec = 0;
+                  currMin++;
+              }
+          }  
+      }
+      else{ //SHOP PHASE        
+          //Creation of shop
+  
+          leftPressed = false;
+          downPressed = false;
+          rightPressed = false;
+          fill(#e0e0de);
+          
+          if (slide < 0 && bounceThreeTimes){ //OVERALL POINT IS TO GET THEM 1000 UNITS TO THE RIGHT
+              slide += acceleration;
+              acceleration += .3;
+          }
+          if (slide > 0){
+              if (acceleration > 0){
+                  acceleration = 0;
+              }
+              slide+= acceleration;
+              acceleration -= .3;
+              if (slide < 0){
+                  bounceCount++;
+              }
+              if (bounceCount >= 3){
+                  bounceThreeTimes = false;
+                  slide = 0;
+              }
+          }
+          
+          drawShop();
+          
+          if (frameCount % 60 == 0){
+              shopTime++;
+          }
+      }
     }
-    else{ // (currDepth >= record)
-      record = currDepth;
-    }
-    
-    
-    
-    //Main game stopwatch
-    drawStopwatch(newRoundTrue || gamePaused);
-    
-    //Round timer
-    drawRoundTimer(newRoundTrue || gamePaused); 
-
-    //Tracking stopwatch and time remaining in the case of a continuing game
-    if (gamePaused == false){ //DIGGING PHASE
-        remainingTime -= (1.0/60); //60 to account for a 60fps game
-        if (remainingTime < (0)){
-            gamePaused = true;
-        }
-        if (frameCount % 60 == 0 && !newRoundTrue){
-            currSec++;
-            if (currSec > 60){
-                currSec = 0;
-                currMin++;
-            }
-        }  
-    }
-    else{ //SHOP PHASE        
-        //Creation of shop
-
-        leftPressed = false;
-        downPressed = false;
-        rightPressed = false;
-        fill(#e0e0de);
-        
-        if (slide < 0 && bounceThreeTimes){ //OVERALL POINT IS TO GET THEM 1000 UNITS TO THE RIGHT
-            slide += acceleration;
-            acceleration += .3;
-        }
-        if (slide > 0){
-            if (acceleration > 0){
-                acceleration = 0;
-            }
-            slide+= acceleration;
-            acceleration -= .3;
-            if (slide < 0){
-                bounceCount++;
-            }
-            if (bounceCount >= 3){
-                bounceThreeTimes = false;
-                slide = 0;
-            }
-        }
-        
-        drawShop();
-        
-        if (frameCount % 60 == 0){
-            shopTime++;
-        }
-    }
-    
 }
+
+public void drawTitleScreen() {
+  if (goDown){
+    bounceText += 5;
+    if (bounceText == 405){
+      goDown = false;
+    }
+  }
+  else{
+    bounceText -= 5;
+    if (bounceText == 385){
+      goDown = true;
+    }
+  }
+  tint(currTint);
+  textSize(77);
+  text("DIG TO KOREA", 30, bounceText);
+  textSize(40);
+  text("START GAME", 220, 490);
+}
+
+public void drawPage1(){
+  fill(#FFFFFF);
+  rect(width/6, height/6, 4 * width/6, 4 * height/6);
+  rect(325, 650, 100, 50);
+  fill(#000000);
+  textSize(20);
+  text("Instruction page 1", width/6 + 10, height/6 + 40);
+  textSize(15);
+  text("Got it", 325 + 10, 650 + 30);
+}
+
+public void drawPage2(){
+  fill(#FFFFFF);
+  rect(width/6, height/6, 4 * width/6, 4 * height/6);
+  rect(325, 650, 100, 50);
+  fill(#000000);
+  textSize(20);
+  text("Instruction page 2", width/6 + 10, height/6 + 40);
+  textSize(15);
+  text("Got it", 325 + 10, 650 + 30);
+}
+
+public void drawPage3(){
+  fill(#FFFFFF);
+  rect(width/6, height/6, 4 * width/6, 4 * height/6);
+  rect(325, 650, 100, 50);
+  fill(#000000);
+  textSize(20);
+  text("Instruction page 3", width/6 + 10, height/6 + 40);
+  textSize(15);
+  text("Got it", 325 + 10, 650 + 30);
+}
+
+public void drawPage4(){
+  fill(#FFFFFF);
+  rect(width/6, height/6, 4 * width/6, 4 * height/6);
+  rect(325, 650, 100, 50);
+  fill(#000000);
+  textSize(20);
+  text("Instruction page 4", width/6 + 10, height/6 + 40);
+  textSize(15);
+  text("Got it", 325 + 10, 650 + 30);
+}
+
+
+
 
 public void drawBanner() {
     image(currDepth >= record ? RECORD_BANNER_SPRITE : BANNER_SPRITE, 0, 370);
@@ -488,6 +616,38 @@ public void keyPressed() {
 
 public void mouseClicked() {
     // only time we need mouse clicks are when we're in the shop
+    if (titleScreen){
+      print(mouseX + ",");
+      print(mouseY);
+      print(currPage);
+       if (mouseX > 220 && mouseY > 464 && mouseX < 517 && mouseY < 488 && currPage == 0){
+         currPage++;
+         onPage[1] = true;
+         onPage[0] = false;
+       }  
+       if(currPage >= 1){
+       if (mouseX > 326 && mouseY > 651 && mouseX < 425 && mouseY < 698){
+         if (currPage == 4){
+           titleScreen = false;
+         }
+         else{
+           currPage++;
+           if (currPage == 2){
+             onPage[2] = true;
+             onPage[1] = false;
+           }
+           if (currPage == 3){
+             onPage[3] = true;
+             onPage[2] = false;
+           }
+           if (currPage == 4){
+             onPage[4] = true;
+             onPage[3] = false;
+           }
+         }
+       }
+    }
+  }
     if (gamePaused && shopTime > 1) {
         // continue game
         if (mouseX > 120 && mouseX < 180 && mouseY > 600 && mouseY < 630) {
@@ -506,13 +666,7 @@ public void mouseClicked() {
         if (mouseX > 380 && mouseX < 430 && mouseY > 500 && mouseY < 530) {
             if (upgrades[1].canAfford())
                 upgrades[1].upgrade();
-        }
-        
-        /*if ()
-        
-        
-        
-        */
+        }        
     }
 }
 
