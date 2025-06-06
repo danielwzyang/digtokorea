@@ -17,7 +17,7 @@ double shopTime = 0;
 
 // Title Screen
 boolean titleScreen;
-int bounceText;
+float bounceText;
 boolean goDown;
 int[] instructions = {0,1,2,3,4};
 int currPage;
@@ -56,7 +56,7 @@ int[] SQUARE_HEALTH = { 30, 60, 90 };
 
 // sprites
 
-PImage BANNER_SPRITE, RECORD_BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE, STONE_SPRITE;
+PImage BANNER_SPRITE, RECORD_BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE, STONE_SPRITE, BACKGROUND_SPRITE;
 PImage[] UPGRADE_SPRITES, RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES, TITANIUM_SPRITES;
 
 int[] resources = { 1000, 1000, 1000, 1000 };
@@ -72,8 +72,8 @@ double accurateDepth; //This essentially subtracts to ensure that the recordTrac
 Upgrade[] upgrades;
 
 public void setup() {
-    size(750, 5000);
-
+    size(750, 1000);
+    BACKGROUND_SPRITE = loadImage("sprites/start.png");
     BANNER_SPRITE = loadImage("sprites/banner.png");
     RECORD_BANNER_SPRITE = loadImage("sprites/record_banner.png");
     SHOP_SPRITE = loadImage("sprites/shop.png");
@@ -119,7 +119,7 @@ public void setup() {
         loadImage("sprites/clay_titanium.png"),
         loadImage("sprites/stone_titanium.png"),
     };
-
+    
     TILE_SIZE = 30;
     w = 30;
     h = 200;
@@ -159,12 +159,8 @@ public void setup() {
     currTint = 255;
     currPage = 0;
     titleScreen = true;
-    drawGrid();
-    saveFrame("full.jpg");
-    drawTitleScreen();
-    windowResize(750, 1000);
     setupGrid();
-    drawGrid();
+    //drawGrid();
  
 }
 
@@ -287,12 +283,7 @@ public void draw() {
     //Tracking correct damage amount
     player.damage = upgrades[0].getValue();
     if (titleScreen){
-      image(loadImage("full.jpg"), 0, 0); //dirt layer
-      loadImage("full.jpg");
-      tint(currTint);
-      image(loadImage("full.jpg").get(0,1350,750,420), 0, 150); //clay layer
-      tint(currTint);
-      image(loadImage("full.jpg").get(0,2790,750,520), 0, 480); //stone layer
+      drawTitleScreen();
       if (tinting){
         currTint--;
         if (currTint == 0){
@@ -419,15 +410,21 @@ public void draw() {
 }
 
 public void drawTitleScreen() {
+  image(BACKGROUND_SPRITE,0,0);
+  
   if (goDown){
-    bounceText += 5;
-    if (bounceText == 405){
+    if (frameCount % 20 == 0){
+      bounceText += 5;
+    }
+    if (bounceText >= 405){
       goDown = false;
     }
   }
   else{
-    bounceText -= 5;
-    if (bounceText == 385){
+    if (frameCount % 20 == 0){
+      bounceText -= 5;
+    }
+    if (bounceText <= 385){
       goDown = true;
     }
   }
@@ -617,9 +614,6 @@ public void keyPressed() {
 public void mouseClicked() {
     // only time we need mouse clicks are when we're in the shop
     if (titleScreen){
-      print(mouseX + ",");
-      print(mouseY);
-      print(currPage);
        if (mouseX > 220 && mouseY > 464 && mouseX < 517 && mouseY < 488 && currPage == 0){
          currPage++;
          onPage[1] = true;
