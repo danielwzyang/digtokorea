@@ -283,7 +283,6 @@ public void draw() {
     //Tracking correct damage amount
     player.damage = upgrades[0].getValue();
     if (titleScreen){
-      drawTitleScreen();
       if (tinting){
         currTint--;
         if (currTint == 0){
@@ -436,6 +435,7 @@ public void drawTitleScreen() {
 }
 
 public void drawPage1(){
+  image(BACKGROUND_SPRITE,0,0);
   fill(#FFFFFF);
   rect(width/6, height/6, 4 * width/6, 4 * height/6);
   rect(325, 650, 100, 50);
@@ -447,6 +447,7 @@ public void drawPage1(){
 }
 
 public void drawPage2(){
+  image(BACKGROUND_SPRITE,0,0);
   fill(#FFFFFF);
   rect(width/6, height/6, 4 * width/6, 4 * height/6);
   rect(325, 650, 100, 50);
@@ -458,6 +459,7 @@ public void drawPage2(){
 }
 
 public void drawPage3(){
+  image(BACKGROUND_SPRITE,0,0);
   fill(#FFFFFF);
   rect(width/6, height/6, 4 * width/6, 4 * height/6);
   rect(325, 650, 100, 50);
@@ -469,6 +471,7 @@ public void drawPage3(){
 }
 
 public void drawPage4(){
+  image(BACKGROUND_SPRITE,0,0);
   fill(#FFFFFF);
   rect(width/6, height/6, 4 * width/6, 4 * height/6);
   rect(325, 650, 100, 50);
