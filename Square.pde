@@ -2,7 +2,6 @@ class Square {
     private int health;
     private PImage sprite;
     private double maxHealth;
-    private double slide = -300;
 
     public Square(int health, PImage sprite) {
         this.health = health;

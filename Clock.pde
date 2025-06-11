@@ -5,6 +5,6 @@ class Clock extends Square {
     
     @Override
     public void breakSquare() {
-        remainingTime = Math.min(remainingTime + maxTime * 0.5, maxTime);
+        remainingTime = Math.min(remainingTime + 2.5, maxTime);
     }
 }
