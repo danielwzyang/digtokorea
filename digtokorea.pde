@@ -59,7 +59,7 @@ int[] SQUARE_HEALTH = { 30, 60, 90 };
 PImage BANNER_SPRITE, RECORD_BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE, STONE_SPRITE;
 PImage[] UPGRADE_SPRITES, RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES, TITANIUM_SPRITES;
 
-int[] resources = { 1000, 1000, 1000, 1000 };
+int[] resources = { 0, 0, 0, 0 };
 
 //int[] MINING_SPEEDS = { 2, 3, 4, 5, 6 };
 //int miningIndex = 0;
@@ -119,7 +119,7 @@ public void setup() {
         loadImage("sprites/clay_titanium.png"),
         loadImage("sprites/stone_titanium.png"),
     };
-
+    
     TILE_SIZE = 30;
     w = 30;
     h = 200;
@@ -142,7 +142,7 @@ public void setup() {
             {0, 20, 30, 10},
             {0, 0, 40, 20},
         }),
-        new TimeUpgrade(new int[]{10, 15, 20, 30, 45}, new int[][]{
+        new TimeUpgrade(new int[]{10, 13, 15, 20, 25}, new int[][]{
             null,
             {10, 5, 0, 0},
             {10, 20, 10, 0},
