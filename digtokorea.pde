@@ -313,7 +313,6 @@ public void stoneLayer() {
 
 
 public void draw() {
-    player.damage = 1000;
     //Tracking correct damage amount
     playerBlockX = (int)player.position.x/30;
     playerBlockY = (int)(player.position.y + TILE_SIZE * .8)/30;
@@ -832,8 +831,6 @@ public void mouseClicked() {
         }     
     }
     if (endPhase){ 
-      print(mouseX);
-      print(mouseY);
       if (mouseX > 326 && mouseX < 424 && mouseY > 764 && mouseY < 822) {
         ending.pause(); 
         setup();
