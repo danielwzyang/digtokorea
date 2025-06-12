@@ -337,6 +337,8 @@ public void draw() {
       ending.play();
       endReached = false;
       endPhase = true;
+      gamePaused = true;
+
     }
     else if (endPhase){
       background(#000000);
@@ -355,6 +357,7 @@ public void draw() {
       textAlign(LEFT);
       rectMode(LEFT);
       stroke(#000000);
+      drawStopwatch(true);
       
     }
     else{
