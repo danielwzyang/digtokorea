@@ -1,3 +1,5 @@
+import processing.video.*;
+
 Square[] grid; // grid for all squares on the screen / anything that can be mined
 Player player;
 int TILE_SIZE; // size for one square
@@ -24,6 +26,16 @@ int currPage;
 boolean tinting = false;
 int currTint;
 int tintTime;
+
+// End reached and theme
+boolean endReached = false;
+boolean endPhase = false;
+int endLength = 0;
+int cameraCount;
+Movie ending;
+
+//Banner depth
+float bannerDepth;
 
 //instructions
 boolean[] onPage = {true, false, false, false, false};
@@ -63,6 +75,7 @@ int[] resources = { 1000, 1000, 1000, 1000 };
 
 //int[] MINING_SPEEDS = { 2, 3, 4, 5, 6 };
 //int miningIndex = 0;
+
 
 //Max depth for record keeping
 int record;
@@ -126,7 +139,8 @@ public void setup() {
 
     grid = new Square[w * h];
     setupGrid();
-
+    
+    bannerDepth = 357;
     player = new Player();
 
     PFont font = createFont("pixelfont.ttf", 50);
@@ -134,8 +148,10 @@ public void setup() {
 
     maxTime = 10;
     
+    ending = new Movie(this, "ending.mov");
+    
     upgrades = new Upgrade[]{
-        new MiningUpgrade(new int[]{2, 3, 4, 5, 6}, new int[][]{
+        new MiningUpgrade(new int[]{100, 3, 4, 5, 6}, new int[][]{
             null,
             {5, 10, 0, 0},
             {10, 15, 15, 0},
@@ -160,7 +176,6 @@ public void setup() {
     currPage = 0;
     titleScreen = true;
     setupGrid();
-    //drawGrid();
  
 }
 
@@ -310,6 +325,18 @@ public void draw() {
         drawPage4();
       }
     }
+    else if(endReached){
+      ending.play();
+      endReached = false;
+      endPhase = true;
+    }
+    else if (endPhase){
+      background(#000000);
+      image(ending,0,275, 750, 400);
+      fill(#000000);
+      textSize(20);
+      text("You made it to Korea!", 213, 470);
+    }
     else{
       if (newRoundTrue) {
           if (leftPressed|| rightPressed|| downPressed){
@@ -330,6 +357,10 @@ public void draw() {
       
       player.move();
       cameraOffset = player.position.y - height/3;
+      if ((200 * TILE_SIZE)-(1000-(327)) <= currDepth * TILE_SIZE){
+        cameraOffset = 200 * TILE_SIZE-1000;
+      }
+      
       
       drawGrid();
   
@@ -348,6 +379,9 @@ public void draw() {
       }
       else{ // (currDepth >= record)
         record = currDepth;
+      }
+      if (((200 * TILE_SIZE)-(1000-357) <= currDepth * TILE_SIZE) && currDepth < record ){
+        drawBannerRecord();
       }
       
       
@@ -371,6 +405,9 @@ public void draw() {
                   currMin++;
               }
           }  
+          if (currDepth == 200){
+            endReached = true;
+          }
       }
       else{ //SHOP PHASE        
           //Creation of shop
@@ -406,6 +443,10 @@ public void draw() {
           }
       }
     }
+}
+
+void movieEvent(Movie ending){
+  ending.read();
 }
 
 public void drawTitleScreen() {
@@ -486,17 +527,29 @@ public void drawPage4(){
 
 
 public void drawBanner() {
-    image(currDepth >= record ? RECORD_BANNER_SPRITE : BANNER_SPRITE, 0, 370);
+    if ((200 * TILE_SIZE)-(1000-357) <= currDepth * TILE_SIZE){
+      bannerDepth = 630-(TILE_SIZE * 200.0 - (player.position.y + player.size))+370;
+    }
+    else{
+      bannerDepth = 357;
+    }
+    image(currDepth >= record ? RECORD_BANNER_SPRITE : BANNER_SPRITE, 0, bannerDepth);
     fill(#ffffff);
     textSize(15);
-    text(currDepth + "m", 10, 390);
+    text(currDepth + "m", 10, bannerDepth + 20);
 }
 
 public void drawBannerRecord() {
-    image(RECORD_BANNER_SPRITE, 0, 370 + (float)((float)record - accurateDepth) * TILE_SIZE);
     fill(#ffffff);
     textSize(15);
-    text(record + "m", 10, 390 + (float)((float)record-accurateDepth) * TILE_SIZE);
+    if ((200 * TILE_SIZE)-(1000-357) <= currDepth * TILE_SIZE){
+      image(RECORD_BANNER_SPRITE, 0, (float)((float)(record) * TILE_SIZE) - 30 * (200.0 - 1000.0/30));
+      text(record + "m", 10, (float)((float)(record) * TILE_SIZE) - 30 * (200.0 - 1000.0/30) + 20);
+    }
+    else{
+      image(RECORD_BANNER_SPRITE, 0, 357 + (float)((float)record - accurateDepth) * TILE_SIZE);
+      text(record + "m", 10, 390-13 + (float)((float)record-accurateDepth) * TILE_SIZE);
+    }
 }
 
 public void drawRoundTimer(boolean stopped) {
