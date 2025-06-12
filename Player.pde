@@ -2,7 +2,7 @@ class Player {
     private PVector position;
     private PVector velocity;
     private float size = TILE_SIZE * 0.8;
-    private int damage = 10;
+    private int damage = 2;
     private boolean mirror;
     private float pickaxeSwingAngle = 0;
     private float pickaxeSwingSpeed = 0.2;
@@ -79,7 +79,7 @@ class Player {
 
         // here the bounding box is defined
         float leftBound = position.x;
-        float topBound = position.y;
+        float topBound = position.y - size;
         float rightBound = position.x + size;
         float bottomBound = position.y + size;
 

@@ -71,7 +71,7 @@ int[] SQUARE_HEALTH = { 30, 60, 90 };
 PImage BANNER_SPRITE, RECORD_BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE, STONE_SPRITE, BACKGROUND_SPRITE;
 PImage[] UPGRADE_SPRITES, RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES, TITANIUM_SPRITES;
 
-int[] resources = { 1000, 1000, 1000, 1000 };
+int[] resources = { 0, 0, 0, 0 };
 
 //int[] MINING_SPEEDS = { 2, 3, 4, 5, 6 };
 //int miningIndex = 0;
@@ -151,14 +151,14 @@ public void setup() {
     ending = new Movie(this, "ending.mov");
     
     upgrades = new Upgrade[]{
-        new MiningUpgrade(new int[]{100, 3, 4, 5, 6}, new int[][]{
+        new MiningUpgrade(new int[]{2, 3, 4, 5, 6}, new int[][]{
             null,
             {5, 10, 0, 0},
             {10, 15, 15, 0},
             {0, 20, 30, 10},
             {0, 0, 40, 20},
         }),
-        new TimeUpgrade(new int[]{10, 15, 20, 30, 45}, new int[][]{
+        new TimeUpgrade(new int[]{10, 13, 15, 20, 25}, new int[][]{
             null,
             {10, 5, 0, 0},
             {10, 20, 10, 0},
