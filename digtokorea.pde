@@ -503,7 +503,7 @@ public void drawPage1(){
   rectMode(CENTER);
   fill(#FFFFFF);
   rect(width/2, height/2, 4 * width/6, 4 * height/6);
-  rect(width/2, 700, 100, 50);
+  rect(width/2, 675, 100, 50);
   fill(#000000);
   textSize(27.5);
   textAlign(CENTER);
@@ -514,7 +514,7 @@ public void drawPage1(){
   text("Use the\n\n\n\n\n\n\nkeys to move your\ncharacter. It will mine\nin that direction as\n long as that key is \nheld.", width/2, height/3+20);
   textSize(15);
   image(ASD_SPRITE, width/2, 430);
-  text("Got it", width/2, 650 + 54);
+  text("Got it", width/2, 650 + 30);
   imageMode(0);
   shapeMode(0);
 }
