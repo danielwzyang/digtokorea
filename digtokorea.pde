@@ -23,9 +23,7 @@ float bounceText;
 boolean goDown;
 int[] instructions = {0,1,2,3,4};
 int currPage;
-boolean tinting = false;
-int currTint;
-int tintTime;
+
 
 // End reached and theme
 boolean endReached = false;
@@ -68,14 +66,17 @@ int[] SQUARE_HEALTH = { 30, 60, 90 };
 
 // sprites
 
-PImage BANNER_SPRITE, RECORD_BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE, STONE_SPRITE, BACKGROUND_SPRITE;
+PImage BANNER_SPRITE, RECORD_BANNER_SPRITE, SHOP_SPRITE, PLAYER_SPRITE, PICKAXE_SPRITE, DIRT_SPRITE, CLAY_SPRITE, STONE_SPRITE, BACKGROUND_SPRITE, ASD_SPRITE, SPACEBAR_SPRITE, MININGSPEED_SPRITE, BOMB_SPRITE;
 PImage[] UPGRADE_SPRITES, RESOURCE_SPRITES, CLOCK_SPRITES, COAL_SPRITES, IRON_SPRITES, GOLD_SPRITES, TITANIUM_SPRITES;
 
 int[] resources = { 0, 0, 0, 0 };
 
-//int[] MINING_SPEEDS = { 2, 3, 4, 5, 6 };
-//int miningIndex = 0;
-
+//bomb count
+int bombCount;
+int testX;
+int testY;
+int playerBlockX;
+int playerBlockY;
 
 //Max depth for record keeping
 int record;
@@ -86,6 +87,10 @@ Upgrade[] upgrades;
 
 public void setup() {
     size(750, 1000);
+    BOMB_SPRITE = loadImage("sprites/bomb.png");
+    MININGSPEED_SPRITE = loadImage("sprites/miningspeed.png");
+    SPACEBAR_SPRITE = loadImage("sprites/spacebar.png");
+    ASD_SPRITE = loadImage("sprites/asd.png");
     BACKGROUND_SPRITE = loadImage("sprites/start.png");
     BANNER_SPRITE = loadImage("sprites/banner.png");
     RECORD_BANNER_SPRITE = loadImage("sprites/record_banner.png");
@@ -172,11 +177,24 @@ public void setup() {
     
     //To create a titleScreen + instructions
     bounceText = 400;
-    currTint = 255;
     currPage = 0;
     titleScreen = true;
     setupGrid();
- 
+    bombCount = 1;
+    
+    gamePaused = false;
+    gameStart = false;
+    endReached = false;
+    endPhase = false;
+    onPage[0] = true;
+    onPage[4] = false;
+    resources[0] = 0;
+    resources[1] = 0;
+    resources[2] = 0;
+    resources[3] = 0;
+    currSec = 0;
+    currMin = 0;
+    newRoundTrue = true;
 }
 
 public void setupGrid() {
@@ -295,20 +313,11 @@ public void stoneLayer() {
 
 
 public void draw() {
+    player.damage = 1000;
     //Tracking correct damage amount
-    player.damage = upgrades[0].getValue();
+    playerBlockX = (int)player.position.x/30;
+    playerBlockY = (int)(player.position.y + TILE_SIZE * .8)/30;
     if (titleScreen){
-      if (tinting){
-        currTint--;
-        if (currTint == 0){
-          tinting = false;
-        }
-      }
-      else{
-        if (currTint < 255){
-          currTint++;
-        }
-      }
       if (onPage[0]){
         drawTitleScreen();
       }
@@ -332,14 +341,26 @@ public void draw() {
     }
     else if (endPhase){
       background(#000000);
-      image(ending,0,275, 750, 400);
+      image(ending,0,305, 750, 400);
       fill(#000000);
       textSize(20);
-      text("You made it to Korea!", 213, 470);
+      textAlign(CENTER);
+      fill(#ffffff);
+      text("You made it to Korea!", width/2, 300-20);
+      stroke(#FFFFFF);
+      fill(#000000);
+      rectMode(CENTER);
+      rect(width/2, 800, 100, 50);
+      fill(#FFFFFF);
+      text("Again?", width/2, 806);
+      textAlign(LEFT);
+      rectMode(LEFT);
+      stroke(#000000);
+      
     }
     else{
       if (newRoundTrue) {
-          if (leftPressed|| rightPressed|| downPressed){
+          if (leftPressed|| rightPressed|| downPressed || key == ' '){
             newRoundTrue = false;
           }
   
@@ -357,7 +378,7 @@ public void draw() {
       
       player.move();
       cameraOffset = player.position.y - height/3;
-      if ((200 * TILE_SIZE)-(1000-(327)) <= currDepth * TILE_SIZE){
+      if ((200 * TILE_SIZE)-(1000-(330)) <= currDepth * TILE_SIZE){
         cameraOffset = 200 * TILE_SIZE-1000;
       }
       
@@ -384,7 +405,10 @@ public void draw() {
         drawBannerRecord();
       }
       
-      
+      //bombCount
+      image(BOMB_SPRITE, -15, 40, 150, 150);
+      textSize(20);
+      text(bombCount, 50, 65);
       
       //Main game stopwatch
       drawStopwatch(newRoundTrue || gamePaused);
@@ -468,7 +492,6 @@ public void drawTitleScreen() {
       goDown = true;
     }
   }
-  tint(currTint);
   textSize(77);
   text("DIG TO KOREA", 30, bounceText);
   textSize(40);
@@ -477,50 +500,94 @@ public void drawTitleScreen() {
 
 public void drawPage1(){
   image(BACKGROUND_SPRITE,0,0);
+  imageMode(CENTER);
+  rectMode(CENTER);
   fill(#FFFFFF);
-  rect(width/6, height/6, 4 * width/6, 4 * height/6);
-  rect(325, 650, 100, 50);
+  rect(width/2, height/2, 4 * width/6, 4 * height/6);
+  rect(width/2, 700, 100, 50);
   fill(#000000);
-  textSize(20);
-  text("Instruction page 1", width/6 + 10, height/6 + 40);
+  textSize(27.5);
+  textAlign(CENTER);
+  text("Welcome to", width/2, 240);
+  textSize(35);
+  text("DIG TO KOREA", width/2, height/6 + 120);
+  textSize(27.5);
+  text("Use the\n\n\n\n\n\n\nkeys to move your\ncharacter. It will mine\nin that direction as\n long as that key is \nheld.", width/2, height/3+20);
   textSize(15);
-  text("Got it", 325 + 10, 650 + 30);
+  image(ASD_SPRITE, width/2, 430);
+  text("Got it", width/2, 650 + 54);
+  imageMode(0);
+  shapeMode(0);
 }
+
+//Round timer & game timer
+//Shop
 
 public void drawPage2(){
   image(BACKGROUND_SPRITE,0,0);
+  imageMode(CENTER);
+  rectMode(CENTER);
   fill(#FFFFFF);
-  rect(width/6, height/6, 4 * width/6, 4 * height/6);
-  rect(325, 650, 100, 50);
+  rect(width/2, height/2, 4 * width/6, 4 * height/6);
+  rect(width/2, 675, 100, 50);
   fill(#000000);
-  textSize(20);
-  text("Instruction page 2", width/6 + 10, height/6 + 40);
+  textSize(27.5);
+  image(BOMB_SPRITE, width/2-30, 550, 300, 300);
+  text("Use bombs with \n\n\n\n\n\n\n to destroy the \nsurrounding area.", width/2, height/3+20);
+  image(SPACEBAR_SPRITE, width/2+50, 430,200,70);
   textSize(15);
-  text("Got it", 325 + 10, 650 + 30);
+  text("Got it", width/2, 650 + 30);
+  imageMode(0);
+  shapeMode(0);
+  //Bomb icon??
 }
 
 public void drawPage3(){
   image(BACKGROUND_SPRITE,0,0);
+  imageMode(CENTER);
+  rectMode(CENTER);
   fill(#FFFFFF);
-  rect(width/6, height/6, 4 * width/6, 4 * height/6);
-  rect(325, 650, 100, 50);
+  rect(width/2, height/2, 4 * width/6, 4 * height/6);
+  rect(width/2, 675, 100, 50);
   fill(#000000);
-  textSize(20);
-  text("Instruction page 3", width/6 + 10, height/6 + 40);
+  textSize(27.5);
+  text("Use the shop after\neach round\n\n\n\n\n\n\n\n\nto buy bombs and\nupgrades using\nmaterials you mine", width/2, height/3);
+  image(SHOP_SPRITE, width/2, 450,400, 140);
   textSize(15);
-  text("Got it", 325 + 10, 650 + 30);
-}
+  text("Got it", width/2, 650 + 30);
+  imageMode(0);
+  shapeMode(0);
+  image(RESOURCE_SPRITES[0], width/4+20, 423, 50, 50);
+  image(RESOURCE_SPRITES[1], width/4+80, 423, 50, 50);
+  image(RESOURCE_SPRITES[2], width/4+140, 423, 50, 50);
+  image(RESOURCE_SPRITES[3], width/4+195, 423, 50, 50);
+  image(MININGSPEED_SPRITE, width/4 + 260, 423, 50, 50);
+  image(CLOCK_SPRITES[1], width/4 + 330, 433, 30, 30);
+
+}//Add resources as icons
 
 public void drawPage4(){
   image(BACKGROUND_SPRITE,0,0);
+  imageMode(CENTER);
+  rectMode(CENTER);
   fill(#FFFFFF);
-  rect(width/6, height/6, 4 * width/6, 4 * height/6);
-  rect(325, 650, 100, 50);
+  rect(width/2, height/2, 4 * width/6, 4 * height/6);
+  rect(width/2, 675, 100, 50);
   fill(#000000);
-  textSize(20);
-  text("Instruction page 4", width/6 + 10, height/6 + 40);
+  textSize(27.5);
+  textAlign(CENTER);
+  text("Each game plays\nin rounds.\nDestroy clocks to\n\n\n\n\n\nget more time\n each round\n to dig.\nBreak your record\neach new game\nand get to Korea\n as fast as possible\nHave fun digging!", width/2, height/5+30);
+  //image(, width/2, 430,200,70);
   textSize(15);
-  text("Got it", 325 + 10, 650 + 30);
+  text("Got it", width/2, 650 + 30);
+  imageMode(0);
+  shapeMode(0);
+  textAlign(LEFT);
+  rectMode(0);
+  image(CLOCK_SPRITES[1], width/2-110, 313, 50, 50);
+  textSize(50);
+  fill(#0394fc);
+  text("00:00", width/2, 355);  
 }
 
 
@@ -597,6 +664,23 @@ public void drawShop() {
         
         image(RESOURCE_SPRITES[i], (float) slide + 530, y);
         text(resources[i], (float) slide + 580, y + 25);
+        //Bomb implementation as it's not quite an upgrade
+        image(BOMB_SPRITE, (float)slide + 130, 564, 300, 300);
+        image(RESOURCE_SPRITES[1], (float)slide + 282, 579);
+        textSize(15);
+        text("15", (float)slide + 290, 640);
+        image(RESOURCE_SPRITES[2], (float)slide + 352, 579);
+        text("15", (float)slide + 360, 640);
+        if(resources[1] >= 15 && resources[2] >= 15){
+          fill(#b5c76d);
+        }
+        else{
+          fill(#d1263c);
+        }
+        rect((float)slide + 421, 584, 50, 30);
+        fill(#ffffff);
+        text("BUY", (float) slide + 431, 584+20); 
+        text("bomb", (float)slide + 202, 640);
     }
     
     // mining speed upgrade
@@ -650,7 +734,6 @@ public void drawGrid() {
             square(col * TILE_SIZE, row * TILE_SIZE - cameraOffset, TILE_SIZE);
             continue;
         }
-
         tint((int)(grid[i].health / grid[i].maxHealth * 80 + (255-80)));
         image(grid[i].sprite, col * TILE_SIZE, row * TILE_SIZE - cameraOffset);
     }
@@ -664,6 +747,28 @@ public void keyPressed() {
             rightPressed = true;
         if (key == 's')
             downPressed = true;
+        //Bomb functioning
+        if (key == ' ' && bombCount > 0){
+           bombCount--;
+           int xChange = -3;
+           int yChange = -4;
+           for (int i = 0; i < 9; i++){
+             xChange = -3;
+             for (int j = 0; j < 7; j++){
+               try{
+                 grid[playerBlockX + (playerBlockY * 30) + (yChange * 30) + xChange].takeDamage(100);
+                 if (grid[playerBlockX + (playerBlockY * 30) + (yChange * 30) + xChange].isDestroyed()) {
+                          grid[playerBlockX + (playerBlockY * 30) + (yChange * 30) + xChange].breakSquare();
+                          grid[playerBlockX + (playerBlockY * 30) + (yChange * 30) + xChange] = null;
+                 }
+               }catch(Exception e){}
+               xChange++;
+             }
+             yChange++;
+           }
+          
+        }
+            
     }
 }
 
@@ -716,7 +821,23 @@ public void mouseClicked() {
         if (mouseX > 380 && mouseX < 430 && mouseY > 500 && mouseY < 530) {
             if (upgrades[1].canAfford())
                 upgrades[1].upgrade();
-        }        
+        }    
+        // Bomb purchase
+        if (mouseX > 421 && mouseX < 469 && mouseY > 584 && mouseY < 612) {
+            if(resources[1] >= 15 && resources[2] >= 15){
+              bombCount++;
+              resources[1] -= 15;
+              resources[2] -= 15;
+            }
+        }     
+    }
+    if (endPhase){ 
+      print(mouseX);
+      print(mouseY);
+      if (mouseX > 326 && mouseX < 424 && mouseY > 764 && mouseY < 822) {
+        ending.pause(); 
+        setup();
+      }
     }
 }
 
